@@ -128,4 +128,5 @@ Format commit: `feat` / `fix` / `refactor` / `style` / `docs` / `test` / `chore`
 ## Mata Kuliah
 
 **Pemrograman Perangkat Mobile**
-Teknik Informatika — Universitas Maritim Raja Ali Haji, 2026
+Teknik Informatika
+Universitas Maritim Raja Ali Haji, 2026
