@@ -1,0 +1,34 @@
+# NLP Pipeline Dependencies — LegalEasier
+# Install: pip install -r requirements.txt
+# NOTE: This has its OWN virtual environment, separate from backend!
+
+# Web framework
+fastapi==0.115.0
+uvicorn[standard]==0.30.0
+
+# OCR & PDF
+PyMuPDF==1.24.0
+pytesseract==0.3.13
+Pillow==10.4.0
+
+# File upload support
+python-multipart==0.0.9
+
+# Data validation
+pydantic==2.9.0
+pydantic-settings==2.5.0
+
+# NLP (Sprint 2+)
+# spacy==3.7.0
+# nltk==3.9.0
+
+# Chunking & RAG (Sprint 2+)
+# langchain==0.2.0
+# langchain-text-splitters==0.2.0
+# sentence-transformers==2.7.0
+# chromadb==0.5.0
+
+# LLM (Sprint 3+)
+# anthropic==0.34.0
+# openai==1.40.0
+# langgraph==0.2.0

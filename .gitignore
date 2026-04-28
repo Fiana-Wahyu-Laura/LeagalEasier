@@ -1,0 +1,54 @@
+# LegalEasier .gitignore
+
+# ===== Environment =====
+.env
+*.env
+!.env.example
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+venv/
+.venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# ===== Flutter / Dart =====
+frontend/.dart_tool/
+frontend/.packages
+frontend/.pub-cache/
+frontend/.pub/
+frontend/build/
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+*.iml
+
+# ===== Firebase credentials — NEVER commit =====
+**/google-services.json
+**/GoogleService-Info.plist
+**/firebase-credentials.json
+firebase_app_id_file.json
+
+# ===== IDE =====
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Database =====
+*.sqlite3
+chroma_db/
+
+# ===== Misc =====
+*.log
+*.tmp

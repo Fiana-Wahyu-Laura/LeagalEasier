@@ -1,0 +1,45 @@
+# LegalEasier — Docker Compose
+# Usage: docker-compose up -d
+
+version: "3.9"
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: legaleasier-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: legaleasier
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+
+  # FastAPI Backend (port 8000)
+  backend:
+    build: ./backend
+    container_name: legaleasier-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+
+  # NLP Pipeline (port 8001)
+  nlp:
+    build: ./nlp_pipeline
+    container_name: legaleasier-nlp
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    env_file:
+      - ./nlp_pipeline/.env
+
+volumes:
+  postgres_data:
