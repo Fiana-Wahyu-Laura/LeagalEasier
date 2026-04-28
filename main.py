@@ -1,7 +1,0 @@
-print("hello world")
-print("hello world")
-print("halo semuanya")
-print("ini indra")
-print("ini jamal")
-print("Test pull jamal")
-print("Test ester faninta")
