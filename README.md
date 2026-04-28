@@ -111,7 +111,6 @@ Lalu ikuti instruksi di folder sesuai jobdesk masing-masing.
 
 ```bash
 git checkout main && git pull origin main
-git checkout -b feat/nama-fitur
 
 # ... kerjakan ...
 
