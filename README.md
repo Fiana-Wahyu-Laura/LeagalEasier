@@ -2,7 +2,7 @@
 
 > Penerjemah Dokumen Hukum ke Bahasa Awam Berbasis AI
 
-LegalEasier adalah aplikasi mobile berbasis AI yang membantu masyarakat umum memahami dokumen hukum Indonesia — kontrak kerja, perjanjian sewa, akta jual beli, dan lainnya — tanpa perlu latar belakang hukum.
+LegalEasier adalah aplikasi mobile berbasis AI yang membantu masyarakat umum memahami dokumen hukum Indonesia (kontrak kerja, perjanjian sewa, akta jual beli, dan lainnya) tanpa perlu latar belakang hukum.
 
 > ⚠️ LegalEasier bukan pengganti konsultan hukum profesional. Seluruh hasil analisis bersifat informatif dan edukatif.
 
@@ -10,7 +10,7 @@ LegalEasier adalah aplikasi mobile berbasis AI yang membantu masyarakat umum mem
 
 ## Status
 
-**In development** — Minggu 1
+**In development** -- Minggu 1
 
 ---
 
@@ -29,12 +29,38 @@ LegalEasier adalah aplikasi mobile berbasis AI yang membantu masyarakat umum mem
 ## Struktur Repo
 
 ```
-legaleasier/
-├── frontend/          # Flutter mobile app
-├── backend/           # FastAPI REST API
-├── nlp_pipeline/      # NLP & AI microservice
-├── database/          # SQL schema & migrations
-└── CLAUDE.md          # Konvensi & panduan coding
+LeagalEasier/
+├── frontend/                        # Flutter mobile app
+│   ├── lib/
+│   │   ├── core/
+│   │   │   ├── constants/
+│   │   │   ├── router/
+│   │   │   ├── theme/
+│   │   │   └── utils/
+│   │   └── features/
+│   │       ├── analysis/            # Analisis dokumen
+│   │       ├── auth/                # Login & register
+│   │       ├── chatbot/             # Chat AI
+│   │       ├── document/            # Upload & manajemen dokumen
+│   │       └── onboarding/          # Onboarding screen
+│   ├── assets/                      # Icons, images, animations
+│   └── test/
+├── backend/                         # FastAPI REST API
+│   ├── app/
+│   │   ├── api/routes/              # Endpoint routes
+│   │   ├── core/                    # Config & security
+│   │   ├── models/                  # SQLAlchemy models
+│   │   └── schemas/                 # Pydantic schemas
+│   └── alembic/                     # DB migrations
+├── nlp_pipeline/                    # NLP & AI microservice
+│   ├── llm/                         # LLM integration (Claude)
+│   ├── ocr/                         # Tesseract OCR
+│   ├── preprocessing/               # Text preprocessing
+│   └── rag/                         # Retrieval-Augmented Generation
+├── database/                        # SQL schema & migrations
+│   └── migrations/
+├── docker-compose.yml
+└── requirements.txt
 ```
 
 ---
@@ -61,8 +87,8 @@ legaleasier/
 Untuk saat ini, mulai dari:
 
 ```bash
-git clone https://github.com/<org>/legaleasier.git
-cd legaleasier
+git clone https://github.com/Fiana-Wahyu-Laura/LeagalEasier.git
+cd LeagalEasier
 ```
 
 Lalu ikuti instruksi di folder sesuai jobdesk masing-masing.
@@ -91,8 +117,8 @@ git checkout -b feat/nama-fitur
 
 git add .
 git commit -m "feat: deskripsi singkat"
-git push origin feat/nama-fitur
-# → buat Pull Request ke main
+git push
+# buat Pull Request ke main
 ```
 
 Format commit: `feat` / `fix` / `refactor` / `style` / `docs` / `test` / `chore`
