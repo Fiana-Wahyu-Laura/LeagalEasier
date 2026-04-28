@@ -1,0 +1,1658 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --teal-50: #E1F5EE; --teal-100: #9FE1CB; --teal-400: #1D9E75; --teal-600: #0F6E56; --teal-800: #085041;
+  --gray-50: #F1EFE8; --gray-100: #D3D1C7; --gray-400: #888780; --gray-600: #5F5E5A; --gray-800: #444441;
+  --amber-50: #FAEEDA; --amber-400: #BA7517; --amber-600: #854F0B;
+  --red-50: #FCEBEB; --red-400: #E24B4A; --red-600: #A32D2D;
+  --green-50: #EAF3DE; --green-400: #639922; --green-600: #3B6D11;
+  --blue-50: #E6F1FB; --blue-400: #378ADD; --blue-600: #185FA5;
+}
+
+.app-shell {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem 3rem;
+  background: var(--color-background-tertiary);
+  min-height: 600px;
+}
+
+.phone-frame {
+  width: 360px;
+  min-height: 720px;
+  background: var(--color-background-primary);
+  border-radius: 40px;
+  border: 0.5px solid var(--color-border-secondary);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  flex-shrink: 0;
+}
+
+.screen {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+.screen.active { display: flex; }
+
+.screen-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+.screen-scroll::-webkit-scrollbar { display: none; }
+
+.bottom-nav {
+  display: flex;
+  border-top: 0.5px solid var(--color-border-tertiary);
+  padding: 8px 0 16px;
+  flex-shrink: 0;
+  background: var(--color-background-primary);
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  padding: 4px 0;
+  transition: opacity 0.15s;
+}
+.nav-item:hover { opacity: 0.7; }
+.nav-icon {
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-label {
+  font-size: 10px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--color-text-secondary);
+}
+.nav-item.active .nav-label { color: var(--teal-600); font-weight: 500; }
+
+.hero-bg {
+  background: linear-gradient(160deg, #085041 0%, #0F6E56 60%, #1D9E75 100%);
+  padding: 28px 24px 32px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-bg::before {
+  content: '';
+  position: absolute;
+  right: -30px; top: -30px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+}
+.hero-bg::after {
+  content: '';
+  position: absolute;
+  right: 30px; bottom: -20px;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+}
+
+.logo-mark {
+  width: 40px; height: 40px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 16px;
+  border: 0.5px solid rgba(255,255,255,0.2);
+}
+
+.hero-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 26px;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+.hero-sub {
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.quota-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.12);
+  border: 0.5px solid rgba(255,255,255,0.2);
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.9);
+}
+.quota-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #9FE1CB;
+}
+
+.content-pad { padding: 20px 20px 0; }
+
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-secondary);
+  margin-bottom: 12px;
+}
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.quick-card {
+  background: var(--color-background-secondary);
+  border-radius: 16px;
+  padding: 16px 14px;
+  cursor: pointer;
+  transition: transform 0.12s;
+  border: 0.5px solid var(--color-border-tertiary);
+}
+.quick-card:hover { transform: scale(0.98); }
+.quick-card:active { transform: scale(0.96); }
+
+.quick-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+.ic-teal { background: var(--teal-50); }
+.ic-blue { background: var(--blue-50); }
+.ic-amber { background: var(--amber-50); }
+.ic-green { background: var(--green-50); }
+
+.quick-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
+}
+.quick-desc {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.doc-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+  cursor: pointer;
+}
+.doc-row:last-child { border-bottom: none; }
+
+.doc-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.doc-info { flex: 1; min-width: 0; }
+.doc-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.doc-meta {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+
+.risk-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+.risk-high { background: var(--red-50); color: var(--red-600); }
+.risk-med { background: var(--amber-50); color: var(--amber-600); }
+.risk-low { background: var(--green-50); color: var(--green-600); }
+
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background: var(--teal-600);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  margin-bottom: 12px;
+}
+.btn-primary:hover { background: var(--teal-800); }
+.btn-primary:active { transform: scale(0.98); }
+
+.btn-secondary {
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  color: var(--color-text-primary);
+  border: 0.5px solid var(--color-border-secondary);
+  border-radius: 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-secondary:hover { background: var(--color-background-secondary); }
+
+.onboarding-hero {
+  background: linear-gradient(160deg, #085041 0%, #1D9E75 100%);
+  padding: 40px 24px 48px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.onboarding-logo {
+  width: 64px; height: 64px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 20px;
+  border: 0.5px solid rgba(255,255,255,0.25);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 28px;
+}
+.onboarding-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+  color: #fff;
+  margin-bottom: 10px;
+  line-height: 1.2;
+}
+.onboarding-sub {
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.6;
+}
+.feature-list {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.feat-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  background: var(--color-background-secondary);
+  border-radius: 14px;
+  border: 0.5px solid var(--color-border-tertiary);
+}
+.feat-icon {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.feat-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+.feat-sub {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+.free-note {
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  padding-bottom: 8px;
+}
+.cta-area { padding: 0 20px 4px; }
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px 10px;
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+  flex-shrink: 0;
+}
+.page-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px;
+  color: var(--color-text-primary);
+  flex: 1;
+}
+.back-btn {
+  width: 32px; height: 32px;
+  border-radius: 10px;
+  background: var(--color-background-secondary);
+  border: 0.5px solid var(--color-border-tertiary);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.detail-hero {
+  background: linear-gradient(160deg, #085041, #1D9E75);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.detail-doc-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff;
+}
+.stats-row {
+  display: flex;
+  gap: 8px;
+}
+.stat-box {
+  flex: 1;
+  background: rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  border: 0.5px solid rgba(255,255,255,0.15);
+}
+.stat-num {
+  font-size: 22px;
+  font-weight: 600;
+  color: #fff;
+  font-family: 'DM Serif Display', serif;
+}
+.stat-lbl {
+  font-size: 10px;
+  color: rgba(255,255,255,0.65);
+  margin-top: 2px;
+}
+
+.risk-card {
+  background: var(--color-background-secondary);
+  border-radius: 14px;
+  padding: 14px;
+  border: 0.5px solid var(--color-border-tertiary);
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.risk-card:hover { transform: scale(0.99); }
+.risk-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.risk-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+.risk-desc {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.chat-header {
+  background: var(--teal-600);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.chat-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  border: 0.5px solid rgba(255,255,255,0.3);
+}
+.chat-name { font-size: 14px; font-weight: 500; color: #fff; }
+.chat-online { font-size: 11px; color: rgba(255,255,255,0.65); }
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 16px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scrollbar-width: none;
+}
+.messages::-webkit-scrollbar { display: none; }
+
+.msg-bubble {
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.msg-ai {
+  background: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  border-bottom-left-radius: 4px;
+  align-self: flex-start;
+  border: 0.5px solid var(--color-border-tertiary);
+}
+.msg-user {
+  background: var(--teal-600);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+  align-self: flex-end;
+}
+
+.chips-row {
+  display: flex;
+  gap: 6px;
+  padding: 0 16px 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+.chips-row::-webkit-scrollbar { display: none; }
+.chip {
+  white-space: nowrap;
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  border: 0.5px solid var(--color-border-secondary);
+  color: var(--color-text-secondary);
+  background: var(--color-background-secondary);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.chip:hover { background: var(--teal-50); border-color: var(--teal-400); color: var(--teal-600); }
+
+.chat-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px 16px;
+  border-top: 0.5px solid var(--color-border-tertiary);
+  flex-shrink: 0;
+}
+.chat-input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 20px;
+  border: 0.5px solid var(--color-border-secondary);
+  background: var(--color-background-secondary);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  outline: none;
+}
+.send-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--teal-600);
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  font-size: 14px;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.send-btn:hover { background: var(--teal-800); }
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-background-secondary);
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin: 0 20px 14px;
+}
+.search-bar input {
+  flex: 1;
+  background: none;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  outline: none;
+}
+.search-bar input::placeholder { color: var(--color-text-secondary); }
+
+.filter-row {
+  display: flex;
+  gap: 6px;
+  padding: 0 20px 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.filter-row::-webkit-scrollbar { display: none; }
+.filter-pill {
+  white-space: nowrap;
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 0.5px solid var(--color-border-secondary);
+  color: var(--color-text-secondary);
+  background: transparent;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.1s;
+}
+.filter-pill.active {
+  background: var(--teal-50);
+  border-color: var(--teal-400);
+  color: var(--teal-600);
+  font-weight: 500;
+}
+
+.nav-tabs {
+  display: flex;
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+  padding: 0 20px;
+  flex-shrink: 0;
+}
+.nav-tab {
+  flex: 1;
+  padding: 12px 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -0.5px;
+  transition: color 0.15s;
+}
+.nav-tab.active {
+  color: var(--teal-600);
+  font-weight: 500;
+  border-bottom-color: var(--teal-400);
+}
+
+.upload-area {
+  margin: 20px;
+  border: 1.5px dashed var(--color-border-secondary);
+  border-radius: 16px;
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  background: var(--color-background-secondary);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.upload-area:hover {
+  border-color: var(--teal-400);
+  background: var(--teal-50);
+}
+.upload-icon { font-size: 32px; }
+.upload-label { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+.upload-sub { font-size: 12px; color: var(--color-text-secondary); }
+
+.limit-gate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 24px 24px;
+  text-align: center;
+  flex: 1;
+}
+.lock-icon {
+  width: 72px; height: 72px;
+  border-radius: 24px;
+  background: var(--teal-50);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px;
+  margin-bottom: 20px;
+  border: 0.5px solid var(--color-border-tertiary);
+}
+.gate-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+}
+.gate-sub {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+.benefit-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  background: var(--color-background-secondary);
+  border-radius: 10px;
+  padding: 10px 14px;
+  border: 0.5px solid var(--color-border-tertiary);
+}
+.check-icon { color: var(--teal-400); font-size: 14px; }
+
+.onb-wave {
+  position: absolute; bottom: -2px; left: 0; right: 0;
+}
+
+.typing-dots { display: flex; gap: 4px; align-items: center; padding: 2px 0; }
+.typing-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--color-text-secondary);
+  animation: bounce 1.2s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-5px); }
+}
+
+.score-ring {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  border: 3px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.1);
+  flex-shrink: 0;
+}
+.score-num {
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1;
+}
+.score-lbl { font-size: 9px; color: rgba(255,255,255,0.6); }
+
+.detail-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.detail-meta { flex: 1; }
+
+.fade-in { animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
+<div class="app-shell">
+  <div class="phone-frame" id="phone">
+    <div class="status-bar">
+      <span>9:41</span>
+      <span style="display:flex;gap:4px;align-items:center">
+        <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><rect x="0" y="3" width="2" height="7" rx="1" fill="currentColor" opacity="0.3"/><rect x="3" y="2" width="2" height="8" rx="1" fill="currentColor" opacity="0.5"/><rect x="6" y="1" width="2" height="9" rx="1" fill="currentColor" opacity="0.7"/><rect x="9" y="0" width="2" height="10" rx="1" fill="currentColor"/></svg>
+        <svg width="16" height="10" viewBox="0 0 16 10" fill="none"><rect x="0" y="1" width="13" height="8" rx="2" stroke="currentColor" stroke-width="1" fill="none" opacity="0.5"/><rect x="13.5" y="3" width="1.5" height="4" rx="0.75" fill="currentColor" opacity="0.5"/><rect x="1" y="2" width="10" height="6" rx="1" fill="currentColor" opacity="0.8"/></svg>
+      </span>
+    </div>
+
+    <!-- SCREEN: ONBOARDING -->
+    <div class="screen active fade-in" id="screen-onboarding">
+      <div class="screen-scroll">
+        <div class="onboarding-hero">
+          <div class="onboarding-logo">⚖️</div>
+          <div class="onboarding-title">Pahami dokumen hukummu dengan mudah</div>
+          <div class="onboarding-sub">Upload, scan, dan tanya — LegalEasier menjelaskan kontrak dalam bahasa yang kamu mengerti.</div>
+          <svg class="onb-wave" viewBox="0 0 360 24" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M0 24 Q90 0 180 12 Q270 24 360 8 L360 24Z" fill="var(--color-background-primary)"/></svg>
+        </div>
+        <div class="feature-list">
+          <div class="feat-item">
+            <div class="feat-icon ic-teal">📋</div>
+            <div>
+              <div class="feat-title">Analisis otomatis</div>
+              <div class="feat-sub">Deteksi klausul berisiko dalam hitungan detik</div>
+            </div>
+          </div>
+          <div class="feat-item">
+            <div class="feat-icon ic-blue">💬</div>
+            <div>
+              <div class="feat-title">Tanya ke AI</div>
+              <div class="feat-sub">Chat langsung tentang isi dokumenmu</div>
+            </div>
+          </div>
+          <div class="feat-item">
+            <div class="feat-icon ic-amber">📷</div>
+            <div>
+              <div class="feat-title">Scan dokumen</div>
+              <div class="feat-sub">Cukup foto — kami proses sisanya</div>
+            </div>
+          </div>
+        </div>
+        <div class="cta-area">
+          <button class="btn-primary" onclick="goTo('home')">Mulai Gratis</button>
+          <button class="btn-secondary" onclick="goTo('login')">Sudah punya akun? Masuk</button>
+          <p class="free-note" style="margin-top:12px">5 analisis gratis tanpa daftar · Tidak perlu kartu kredit</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN: LOGIN -->
+    <div class="screen fade-in" id="screen-login">
+      <div class="screen-scroll">
+        <div style="padding:32px 24px 0">
+          <div style="font-size:12px;color:var(--color-text-secondary);cursor:pointer;margin-bottom:24px" onclick="goTo('onboarding')">← Kembali</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--color-text-primary);margin-bottom:6px">Selamat datang kembali</div>
+          <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:28px">Masuk untuk menyimpan &amp; melanjutkan analisismu</div>
+
+          <button class="btn-secondary" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px" onclick="goTo('home')">
+            <span style="font-size:16px">G</span> Lanjutkan dengan Google
+          </button>
+          <div style="text-align:center;font-size:12px;color:var(--color-text-secondary);margin-bottom:16px">atau masuk dengan email</div>
+
+          <div style="margin-bottom:14px">
+            <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:6px">Email</div>
+            <input type="email" placeholder="nama@email.com" style="width:100%;padding:12px 14px;border-radius:12px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--color-text-primary);outline:none">
+          </div>
+          <div style="margin-bottom:20px">
+            <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:6px">Password</div>
+            <input type="password" value="••••••••" style="width:100%;padding:12px 14px;border-radius:12px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--color-text-primary);outline:none">
+            <div style="text-align:right;margin-top:6px;font-size:12px;color:var(--teal-600);cursor:pointer">Lupa password?</div>
+          </div>
+          <button class="btn-primary" onclick="goTo('home')">Masuk</button>
+          <div style="text-align:center;font-size:13px;color:var(--color-text-secondary);margin-top:8px">Belum punya akun? <span style="color:var(--teal-600);cursor:pointer;font-weight:500">Daftar gratis</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN: HOME -->
+    <div class="screen fade-in" id="screen-home">
+      <div class="screen-scroll">
+        <div class="hero-bg">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.6)">Halo,</div>
+              <div style="font-family:'DM Serif Display',serif;font-size:22px;color:#fff">LegalEasier</div>
+            </div>
+            <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.15);border:0.5px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600;cursor:pointer">AI</div>
+          </div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:16px">Dokumen hukummu lebih mudah dipahami hari ini.</div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div class="quota-chip"><div class="quota-dot"></div>3 analisis tersisa dari 5 gratis</div>
+            <div style="background:rgba(255,255,255,0.15);border:0.5px solid rgba(255,255,255,0.2);border-radius:20px;padding:5px 12px;font-size:11px;color:#fff;cursor:pointer">Upgrade</div>
+          </div>
+        </div>
+
+        <div class="content-pad">
+          <div class="section-label" style="margin-top:20px">Aksi cepat</div>
+          <div class="quick-grid">
+            <div class="quick-card" onclick="goTo('upload')">
+              <div class="quick-icon ic-teal">📤</div>
+              <div class="quick-name">Upload Dokumen</div>
+              <div class="quick-desc">PDF, foto, atau file Word</div>
+            </div>
+            <div class="quick-card" onclick="goTo('upload')">
+              <div class="quick-icon ic-amber">📷</div>
+              <div class="quick-name">Scan Dokumen</div>
+              <div class="quick-desc">Foto langsung dari kamera</div>
+            </div>
+            <div class="quick-card" onclick="goTo('chat')">
+              <div class="quick-icon ic-blue">💬</div>
+              <div class="quick-name">Tanya AI</div>
+              <div class="quick-desc">Chat tentang dokumenmu</div>
+            </div>
+            <div class="quick-card" onclick="goTo('history')">
+              <div class="quick-icon ic-green">🗂️</div>
+              <div class="quick-name">Riwayat</div>
+              <div class="quick-desc">Dokumen sebelumnya</div>
+            </div>
+          </div>
+
+          <div class="section-label">Dokumen terbaru</div>
+          <div onclick="goTo('detail')">
+            <div class="doc-row">
+              <div class="doc-icon ic-teal">📄</div>
+              <div class="doc-info">
+                <div class="doc-name">Kontrak Kerja PT Maju Jaya.pdf</div>
+                <div class="doc-meta">3 hari lalu · 14 halaman</div>
+              </div>
+              <div class="risk-badge risk-high">Risiko Tinggi</div>
+            </div>
+          </div>
+          <div class="doc-row">
+            <div class="doc-icon ic-amber">🏠</div>
+            <div class="doc-info">
+              <div class="doc-name">Perjanjian Sewa Kos 2025.pdf</div>
+              <div class="doc-meta">5 hari lalu · 8 halaman</div>
+            </div>
+            <div class="risk-badge risk-med">Sedang</div>
+          </div>
+          <div class="doc-row" style="margin-bottom:20px">
+            <div class="doc-icon ic-green">📝</div>
+            <div class="doc-info">
+              <div class="doc-name">Perjanjian Magang Startup.docx</div>
+              <div class="doc-meta">12 Jan 2025 · 5 halaman</div>
+            </div>
+            <div class="risk-badge risk-low">Aman</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item active" onclick="goTo('home')">
+          <div class="nav-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+          <div class="nav-label" style="color:var(--teal-600)">Beranda</div>
+        </div>
+        <div class="nav-item" onclick="goTo('history')">
+          <div class="nav-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="4" y="3" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+          <div class="nav-label">Dokumen</div>
+        </div>
+        <div class="nav-item" onclick="goTo('chat')">
+          <div class="nav-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 5h12a1 1 0 011 1v7a1 1 0 01-1 1H7l-3 3V6a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+          <div class="nav-label">Chat</div>
+        </div>
+        <div class="nav-item" onclick="goTo('profile')">
+          <div class="nav-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M4 17c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg></div>
+          <div class="nav-label">Profil</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN: UPLOAD -->
+    <div class="screen fade-in" id="screen-upload">
+      <div class="page-header">
+        <div class="back-btn" onclick="goTo('home')">←</div>
+        <div class="page-title">Tambah Dokumen</div>
+      </div>
+      <div class="screen-scroll">
+        <div style="padding:20px 0 0">
+          <div class="upload-area" onclick="goTo('detail')">
+            <div class="upload-icon">📷</div>
+            <div class="upload-label">Scan dengan Kamera</div>
+            <div class="upload-sub">Foto langsung — AI akan memproses otomatis</div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:12px;padding:0 20px 16px">
+            <div style="flex:1;height:0.5px;background:var(--color-border-tertiary)"></div>
+            <div style="font-size:12px;color:var(--color-text-secondary)">atau</div>
+            <div style="flex:1;height:0.5px;background:var(--color-border-tertiary)"></div>
+          </div>
+
+          <div style="padding:0 20px">
+            <div style="background:var(--color-background-secondary);border-radius:14px;padding:16px;border:0.5px solid var(--color-border-tertiary);cursor:pointer;display:flex;align-items:center;gap:14px;margin-bottom:10px" onclick="goTo('detail')">
+              <div style="width:40px;height:40px;background:var(--blue-50);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">📤</div>
+              <div>
+                <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">Upload File</div>
+                <div style="font-size:11px;color:var(--color-text-secondary)">PDF, DOCX, JPG — maks 20MB</div>
+              </div>
+              <div style="margin-left:auto;color:var(--color-text-secondary);font-size:16px">›</div>
+            </div>
+
+            <div style="background:var(--color-background-secondary);border-radius:14px;padding:14px;border:0.5px solid var(--color-border-tertiary);margin-bottom:20px">
+              <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:10px">Format yang didukung</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <span style="font-size:11px;padding:4px 10px;border-radius:20px;background:var(--teal-50);color:var(--teal-600)">PDF</span>
+                <span style="font-size:11px;padding:4px 10px;border-radius:20px;background:var(--blue-50);color:var(--blue-600)">DOCX</span>
+                <span style="font-size:11px;padding:4px 10px;border-radius:20px;background:var(--amber-50);color:var(--amber-600)">JPG / PNG</span>
+              </div>
+            </div>
+
+            <div style="background:var(--teal-50);border-radius:12px;padding:12px 14px;border:0.5px solid var(--teal-100)">
+              <div style="font-size:12px;color:var(--teal-600);font-weight:500;margin-bottom:4px">⚠️ Disclaimer</div>
+              <div style="font-size:11px;color:var(--teal-800);line-height:1.5">LegalEasier bukan pengganti konsultan hukum profesional. Hasil analisis bersifat informatif.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN: DETAIL -->
+    <div class="screen fade-in" id="screen-detail">
+      <div class="page-header">
+        <div class="back-btn" onclick="goTo('home')">←</div>
+        <div class="page-title">Analisis Dokumen</div>
+      </div>
+      <div class="screen-scroll">
+        <div class="detail-hero">
+          <div class="detail-top">
+            <div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.55);margin-bottom:4px">Kontrak Kerja · 14 hal.</div>
+              <div class="detail-doc-name">Kontrak Kerja PT Maju Jaya.pdf</div>
+            </div>
+            <div class="score-ring">
+              <div class="score-num">72</div>
+              <div class="score-lbl">Skor Aman</div>
+            </div>
+          </div>
+          <div class="stats-row">
+            <div class="stat-box">
+              <div class="stat-num" style="color:#F09595">3</div>
+              <div class="stat-lbl">Klausul Berisiko</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-num">14</div>
+              <div class="stat-lbl">Halaman</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-num" style="color:#5DCAA5">9</div>
+              <div class="stat-lbl">Klausul Aman</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding:16px 16px 0">
+          <div class="nav-tabs" style="padding:0;margin-bottom:14px">
+            <div class="nav-tab active" id="tab-risiko" onclick="switchTab('risiko')">Temuan Risiko</div>
+            <div class="nav-tab" id="tab-ringkasan" onclick="switchTab('ringkasan')">Ringkasan</div>
+            <div class="nav-tab" id="tab-terjemahan" onclick="switchTab('terjemahan')">Terjemahan</div>
+          </div>
+
+          <div id="panel-risiko">
+            <div class="risk-card">
+              <div class="risk-card-top">
+                <div class="risk-title">Klausul Non-Kompetisi</div>
+                <div class="risk-badge risk-high">Tinggi</div>
+              </div>
+              <div class="risk-desc">Pasal 18 melarang kamu bekerja di industri yang sama selama 3 tahun pasca-resign, tanpa batasan geografis yang jelas. Berpotensi merugikan.</div>
+            </div>
+            <div class="risk-card">
+              <div class="risk-card-top">
+                <div class="risk-title">Jam Lembur Tidak Terbatas</div>
+                <div class="risk-badge risk-med">Sedang</div>
+              </div>
+              <div class="risk-desc">Pasal 12 tidak mencantumkan batas maksimal jam lembur. Kompensasi lembur perlu dikonfirmasi.</div>
+            </div>
+            <div class="risk-card">
+              <div class="risk-card-top">
+                <div class="risk-title">Hak Kekayaan Intelektual</div>
+                <div class="risk-badge risk-low">Rendah</div>
+              </div>
+              <div class="risk-desc">Semua karya selama masa kerja menjadi milik perusahaan — umum dan wajar, namun perlu diperhatikan.</div>
+            </div>
+          </div>
+
+          <div id="panel-ringkasan" style="display:none">
+            <div style="background:var(--color-background-secondary);border-radius:14px;padding:16px;border:0.5px solid var(--color-border-tertiary)">
+              <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:10px">Ringkasan Eksekutif</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;gap:10px;font-size:13px;color:var(--color-text-secondary);line-height:1.5"><span style="color:var(--teal-400);font-weight:600;flex-shrink:0">1.</span>Kontrak kerja waktu tidak tertentu (PKWTT) dengan masa percobaan 3 bulan.</div>
+                <div style="display:flex;gap:10px;font-size:13px;color:var(--color-text-secondary);line-height:1.5"><span style="color:var(--teal-400);font-weight:600;flex-shrink:0">2.</span>Gaji pokok + tunjangan, dibayar tanggal 25 setiap bulan.</div>
+                <div style="display:flex;gap:10px;font-size:13px;color:var(--color-text-secondary);line-height:1.5"><span style="color:var(--teal-400);font-weight:600;flex-shrink:0">3.</span>Klausul non-kompetisi selama 3 tahun perlu dinegosiasi ulang.</div>
+                <div style="display:flex;gap:10px;font-size:13px;color:var(--color-text-secondary);line-height:1.5"><span style="color:var(--teal-400);font-weight:600;flex-shrink:0">4.</span>Hak cuti 12 hari kerja per tahun sesuai UU Ketenagakerjaan.</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="panel-terjemahan" style="display:none">
+            <div style="background:var(--color-background-secondary);border-radius:14px;padding:16px;border:0.5px solid var(--color-border-tertiary);margin-bottom:10px">
+              <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-text-secondary);margin-bottom:8px">Pasal 1 — Identitas</div>
+              <div style="font-size:12px;color:var(--color-text-secondary);font-style:italic;margin-bottom:8px;padding:8px;background:var(--color-background-primary);border-radius:8px;border-left:2px solid var(--color-border-secondary)">"Pihak Pertama selaku pemberi kerja mengikatkan diri kepada Pihak Kedua..."</div>
+              <div style="font-size:13px;color:var(--color-text-primary);line-height:1.6">🗣️ <strong>Artinya:</strong> Perusahaan (PT Maju Jaya) setuju untuk mempekerjakan kamu sesuai syarat yang tertulis di kontrak ini.</div>
+            </div>
+            <div style="background:var(--color-background-secondary);border-radius:14px;padding:16px;border:0.5px solid var(--color-border-tertiary)">
+              <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-text-secondary);margin-bottom:8px">Pasal 18 — Non-Kompetisi ⚠️</div>
+              <div style="font-size:12px;color:var(--color-text-secondary);font-style:italic;margin-bottom:8px;padding:8px;background:var(--red-50);border-radius:8px;border-left:2px solid var(--red-400)">"Pihak Kedua dilarang bekerja pada perusahaan yang bergerak di bidang serupa selama 3 (tiga) tahun..."</div>
+              <div style="font-size:13px;color:var(--color-text-primary);line-height:1.6">🗣️ <strong>Artinya:</strong> Setelah resign, kamu tidak boleh kerja di perusahaan sejenis selama 3 tahun. Ini cukup ketat dan bisa merugikanmu.</div>
+            </div>
+          </div>
+
+          <button class="btn-primary" style="margin-top:16px;margin-bottom:20px" onclick="goTo('chat')">💬 Tanya AI tentang dokumen ini</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN: CHAT -->
+    <div class="screen fade-in" id="screen-chat">
+      <div class="chat-header">
+        <div class="back-btn" style="background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.2);color:#fff" onclick="goTo('detail')">←</div>
+        <div class="chat-avatar">L</div>
+        <div>
+          <div class="chat-name">LegalEasier AI</div>
+          <div class="chat-online">● Online · Kontrak Kerja PT Maju Jaya</div>
+        </div>
+      </div>
+
+      <div class="messages" id="chat-messages">
+        <div class="msg-bubble msg-ai">Halo! Saya siap membantu menjelaskan isi <strong>Kontrak Kerja PT Maju Jaya</strong>. Ada yang ingin kamu tanyakan?</div>
+        <div class="msg-bubble msg-user">Klausul non-kompetisi itu maksudnya apa ya? Apakah berbahaya buat saya?</div>
+        <div class="msg-bubble msg-ai">Klausul non-kompetisi di <strong>Pasal 18</strong> dokumenmu melarang kamu bekerja di perusahaan sejenis selama <strong>3 tahun</strong> setelah resign, tanpa batasan wilayah.<br><br>Ini cukup ketat — normalnya hanya 1 tahun dan terbatas di 1 kota. Kamu bisa coba negosiasi batas waktunya sebelum tanda tangan. 💡</div>
+      </div>
+
+      <div class="chips-row">
+        <div class="chip" onclick="sendMsg('Bagaimana cara nego?')">Bagaimana cara nego?</div>
+        <div class="chip" onclick="sendMsg('Apakah klausul ini legal?')">Apakah klausul ini legal?</div>
+        <div class="chip" onclick="sendMsg('Apa saja hak saya?')">Apa saja hak saya?</div>
+      </div>
+
+      <div class="chat-input-row">
+        <input class="chat-input" id="chat-input" type="text" placeholder="Ketik pertanyaanmu..." onkeydown="if(event.key==='Enter')sendMsg()">
+        <button class="send-btn" onclick="sendMsg()">➤</button>
+      </div>
+    </div>
+
+    <!-- SCREEN: HISTORY -->
+    <div class="screen fade-in" id="screen-history">
+      <div class="page-header">
+        <div class="page-title">Riwayat</div>
+      </div>
+      <div class="screen-scroll">
+        <div class="search-bar" style="margin-top:14px">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="var(--color-text-secondary)" stroke-width="1.2"/><path d="M9 9l3 3" stroke="var(--color-text-secondary)" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <input type="text" placeholder="Cari dokumen...">
+        </div>
+        <div class="filter-row">
+          <button class="filter-pill active">Semua</button>
+          <button class="filter-pill" onclick="toggleFilter(this)">Kontrak</button>
+          <button class="filter-pill" onclick="toggleFilter(this)">Perjanjian</button>
+          <button class="filter-pill" onclick="toggleFilter(this)">Lainnya</button>
+        </div>
+
+        <div style="padding:0 20px">
+          <div class="doc-row" onclick="goTo('detail')">
+            <div class="doc-icon ic-teal">📄</div>
+            <div class="doc-info">
+              <div class="doc-name">Kontrak Kerja PT Maju Jaya.pdf</div>
+              <div class="doc-meta">3 hari lalu · 14 hal.</div>
+            </div>
+            <div><div class="risk-badge risk-high">Tinggi</div><div style="font-size:10px;color:var(--color-text-secondary);text-align:right;margin-top:3px">Buka →</div></div>
+          </div>
+          <div class="doc-row">
+            <div class="doc-icon ic-amber">🏠</div>
+            <div class="doc-info">
+              <div class="doc-name">Perjanjian Sewa Kos 2025.pdf</div>
+              <div class="doc-meta">5 hari lalu · 8 hal.</div>
+            </div>
+            <div><div class="risk-badge risk-med">Sedang</div><div style="font-size:10px;color:var(--color-text-secondary);text-align:right;margin-top:3px">Buka →</div></div>
+          </div>
+          <div class="doc-row">
+            <div class="doc-icon ic-green">📝</div>
+            <div class="doc-info">
+              <div class="doc-name">Perjanjian Magang Startup.docx</div>
+              <div class="doc-meta">12 Jan 2025 · 5 hal.</div>
+            </div>
+            <div><div class="risk-badge risk-low">Aman</div><div style="font-size:10px;color:var(--color-text-secondary);text-align:right;margin-top:3px">Buka →</div></div>
+          </div>
+          <div class="doc-row">
+            <div class="doc-icon" style="background:var(--teal-50)">🤝</div>
+            <div class="doc-info">
+              <div class="doc-name">Perjanjian Jual Beli Motor.pdf</div>
+              <div class="doc-meta">5 Jan 2025 · 3 hal.</div>
+            </div>
+            <div><div class="risk-badge risk-low">Aman</div><div style="font-size:10px;color:var(--color-text-secondary);text-align:right;margin-top:3px">Buka →</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item" onclick="goTo('home')">
+          <div class="nav-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+          <div class="nav-label">Beranda</div>
+        </div>
+        <div class="nav-item active">
+          <div class="nav-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="4" y="3" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+          <div class="nav-label" style="color:var(--teal-600)">Dokumen</div>
+        </div>
+        <div class="nav-item" onclick="goTo('chat')">
+          <div class="nav-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 5h12a1 1 0 011 1v7a1 1 0 01-1 1H7l-3 3V6a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+          <div class="nav-label">Chat</div>
+        </div>
+        <div class="nav-item" onclick="goTo('profile')">
+          <div class="nav-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M4 17c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg></div>
+          <div class="nav-label">Profil</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN: LIMIT GATE -->
+    <div class="screen fade-in" id="screen-limit">
+      <div class="screen-scroll">
+        <div class="limit-gate">
+          <div class="lock-icon">🔒</div>
+          <div class="gate-title">Kamu sudah pakai 5 analisis gratis!</div>
+          <div class="gate-sub">Daftar akun gratis untuk terus menggunakan LegalEasier — tidak perlu kartu kredit. Riwayat &amp; dokumenmu akan tersimpan.</div>
+          <div class="benefit-list">
+            <div class="benefit-item"><span class="check-icon">✓</span>Simpan semua dokumen &amp; riwayat chat</div>
+            <div class="benefit-item"><span class="check-icon">✓</span>10 analisis/bulan dengan akun gratis</div>
+            <div class="benefit-item"><span class="check-icon">✓</span>Sync lintas perangkat</div>
+            <div class="benefit-item"><span class="check-icon">✓</span>Tidak ada iklan</div>
+          </div>
+          <div style="width:100%">
+            <button class="btn-primary" onclick="goTo('login')">Daftar Gratis Sekarang</button>
+            <button class="btn-secondary" style="display:flex;align-items:center;justify-content:center;gap:8px" onclick="goTo('login')">
+              <span style="font-size:15px">G</span> Daftar dengan Google (1 klik)
+            </button>
+            <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--color-text-secondary);cursor:pointer" onclick="goTo('login')">Sudah punya akun? <span style="color:var(--teal-600)">Masuk</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN: PROFILE -->
+    <div class="screen fade-in" id="screen-profile">
+      <div class="screen-scroll">
+        <!-- Profile Hero -->
+        <div style="background:linear-gradient(160deg,#085041 0%,#1D9E75 100%);padding:28px 24px 36px;position:relative;overflow:hidden">
+          <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.05)"></div>
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.35);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;flex-shrink:0">A</div>
+            <div>
+              <div style="font-family:'DM Serif Display',serif;font-size:20px;color:#fff;margin-bottom:2px">Andi Saputra</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.65)">andi.saputra@email.com</div>
+              <div style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.15);border:0.5px solid rgba(255,255,255,0.25);border-radius:20px;padding:4px 10px">
+                <span style="width:6px;height:6px;border-radius:50%;background:#9FE1CB;display:inline-block"></span>
+                <span style="font-size:11px;color:rgba(255,255,255,0.9)">Akun Gratis</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div style="display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary)">
+          <div style="flex:1;text-align:center;padding:16px 8px;border-right:0.5px solid var(--color-border-tertiary)">
+            <div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--color-text-primary)">4</div>
+            <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">Dokumen</div>
+          </div>
+          <div style="flex:1;text-align:center;padding:16px 8px;border-right:0.5px solid var(--color-border-tertiary)">
+            <div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--color-text-primary)">2</div>
+            <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">Analisis tersisa</div>
+          </div>
+          <div style="flex:1;text-align:center;padding:16px 8px">
+            <div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--color-text-primary)">12</div>
+            <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">Chat AI</div>
+          </div>
+        </div>
+
+        <!-- Upgrade Banner -->
+        <div onclick="goTo('upgrade')" style="margin:16px 20px 0;background:linear-gradient(135deg,var(--teal-50),var(--blue-50));border-radius:14px;padding:14px 16px;border:0.5px solid var(--teal-100);display:flex;align-items:center;gap:12px;cursor:pointer">
+          <div style="font-size:22px">⚡</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600;color:var(--teal-800);margin-bottom:2px">Upgrade ke Pro</div>
+            <div style="font-size:11px;color:var(--teal-600)">Analisis tak terbatas + fitur lanjutan</div>
+          </div>
+          <div style="font-size:13px;color:var(--teal-600);font-weight:500">›</div>
+        </div>
+
+        <!-- Menu Items -->
+        <div style="padding:20px 20px 0">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-text-secondary);margin-bottom:10px">Akun</div>
+
+          <div style="background:var(--color-background-secondary);border-radius:14px;border:0.5px solid var(--color-border-tertiary);overflow:hidden;margin-bottom:16px">
+            <div onclick="goTo('edit-profile')" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:0.5px solid var(--color-border-tertiary);cursor:pointer">
+              <div style="width:32px;height:32px;border-radius:10px;background:var(--teal-50);display:flex;align-items:center;justify-content:center;font-size:15px">👤</div>
+              <div style="flex:1;font-size:13px;color:var(--color-text-primary)">Edit Profil</div>
+              <div style="color:var(--color-text-secondary)">›</div>
+            </div>
+            <div onclick="goTo('notifikasi')" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:0.5px solid var(--color-border-tertiary);cursor:pointer">
+              <div style="width:32px;height:32px;border-radius:10px;background:var(--blue-50);display:flex;align-items:center;justify-content:center;font-size:15px">🔔</div>
+              <div style="flex:1;font-size:13px;color:var(--color-text-primary)">Notifikasi</div>
+              <div style="color:var(--color-text-secondary)">›</div>
+            </div>
+            <div onclick="goTo('keamanan')" style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer">
+              <div style="width:32px;height:32px;border-radius:10px;background:var(--amber-50);display:flex;align-items:center;justify-content:center;font-size:15px">🔒</div>
+              <div style="flex:1;font-size:13px;color:var(--color-text-primary)">Keamanan & Password</div>
+              <div style="color:var(--color-text-secondary)">›</div>
+            </div>
+          </div>
+
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-text-secondary);margin-bottom:10px">Tentang</div>
+          <div style="background:var(--color-background-secondary);border-radius:14px;border:0.5px solid var(--color-border-tertiary);overflow:hidden;margin-bottom:16px">
+            <div onclick="goTo('panduan')" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:0.5px solid var(--color-border-tertiary);cursor:pointer">
+              <div style="width:32px;height:32px;border-radius:10px;background:var(--green-50);display:flex;align-items:center;justify-content:center;font-size:15px">📖</div>
+              <div style="flex:1;font-size:13px;color:var(--color-text-primary)">Panduan Penggunaan</div>
+              <div style="color:var(--color-text-secondary)">›</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer">
+              <div style="width:32px;height:32px;border-radius:10px;background:var(--gray-50);display:flex;align-items:center;justify-content:center;font-size:15px">ℹ️</div>
+              <div style="flex:1;font-size:13px;color:var(--color-text-primary)">Versi 1.0.0</div>
+              <div style="font-size:11px;color:var(--color-text-secondary)">Terbaru</div>
+            </div>
+          </div>
+
+          <button onclick="goTo('login')" style="width:100%;padding:13px;background:var(--red-50);color:var(--red-600);border:0.5px solid var(--red-400);border-radius:14px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:24px">Keluar dari Akun</button>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item" onclick="goTo('home')">
+          <div class="nav-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+          <div class="nav-label">Beranda</div>
+        </div>
+        <div class="nav-item" onclick="goTo('history')">
+          <div class="nav-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="4" y="3" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+          <div class="nav-label">Dokumen</div>
+        </div>
+        <div class="nav-item" onclick="goTo('chat')">
+          <div class="nav-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 5h12a1 1 0 011 1v7a1 1 0 01-1 1H7l-3 3V6a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+          <div class="nav-label">Chat</div>
+        </div>
+        <div class="nav-item active">
+          <div class="nav-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3" stroke="var(--teal-600)" stroke-width="1.5" fill="none"/><path d="M4 17c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="var(--teal-600)" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg></div>
+          <div class="nav-label" style="color:var(--teal-600)">Profil</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN: EDIT PROFILE -->
+    <div class="screen fade-in" id="screen-edit-profile">
+      <div class="page-header">
+        <div class="back-btn" onclick="goTo('profile')">←</div>
+        <div class="page-title">Edit Profil</div>
+        <div style="font-size:13px;color:var(--teal-600);font-weight:500;cursor:pointer" onclick="goTo('profile')">Simpan</div>
+      </div>
+      <div class="screen-scroll">
+        <div style="padding:24px 20px">
+          <!-- Avatar -->
+          <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:28px">
+            <div style="position:relative">
+              <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--teal-600),var(--teal-400));display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;color:#fff;border:3px solid var(--teal-100)">A</div>
+              <div style="position:absolute;bottom:0;right:0;width:26px;height:26px;border-radius:50%;background:var(--teal-600);border:2px solid var(--color-background-primary);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer">✏️</div>
+            </div>
+            <div style="font-size:12px;color:var(--teal-600);margin-top:10px;cursor:pointer">Ganti Foto Profil</div>
+          </div>
+
+          <!-- Form Fields -->
+          <div style="margin-bottom:16px">
+            <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:6px">Nama Lengkap</div>
+            <input type="text" value="Andi Saputra" style="width:100%;padding:12px 14px;border-radius:12px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--color-text-primary);outline:none">
+          </div>
+          <div style="margin-bottom:16px">
+            <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:6px">Email</div>
+            <input type="email" value="andi.saputra@email.com" style="width:100%;padding:12px 14px;border-radius:12px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--color-text-primary);outline:none">
+          </div>
+          <div style="margin-bottom:16px">
+            <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:6px">Nomor HP (opsional)</div>
+            <input type="tel" placeholder="+62 xxx xxxx xxxx" style="width:100%;padding:12px 14px;border-radius:12px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--color-text-primary);outline:none">
+          </div>
+          <div style="margin-bottom:28px">
+            <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:6px">Pekerjaan (opsional)</div>
+            <input type="text" placeholder="Contoh: Karyawan swasta, Mahasiswa..." style="width:100%;padding:12px 14px;border-radius:12px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--color-text-primary);outline:none">
+          </div>
+          <button class="btn-primary" onclick="goTo('profile')">Simpan Perubahan</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN: NOTIFIKASI -->
+    <div class="screen fade-in" id="screen-notifikasi">
+      <div class="page-header">
+        <div class="back-btn" onclick="goTo('profile')">←</div>
+        <div class="page-title">Notifikasi</div>
+      </div>
+      <div class="screen-scroll">
+        <div style="padding:20px">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-text-secondary);margin-bottom:10px">Pengingat</div>
+          <div style="background:var(--color-background-secondary);border-radius:14px;border:0.5px solid var(--color-border-tertiary);overflow:hidden;margin-bottom:20px">
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:0.5px solid var(--color-border-tertiary)">
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">Analisis selesai</div>
+                <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">Notifikasi saat dokumen selesai dianalisis</div>
+              </div>
+              <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer">
+                <input type="checkbox" checked style="opacity:0;width:0;height:0">
+                <span onclick="this.parentElement.querySelector('input').checked=!this.parentElement.querySelector('input').checked;this.style.background=this.parentElement.querySelector('input').checked?'var(--teal-600)':'var(--gray-100)'" style="position:absolute;inset:0;background:var(--teal-600);border-radius:24px;transition:0.2s"><span style="position:absolute;left:2px;top:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:0.2s;transform:translateX(20px)"></span></span>
+              </label>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:0.5px solid var(--color-border-tertiary)">
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">Tips hukum mingguan</div>
+                <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">Artikel & info hukum terkini setiap minggu</div>
+              </div>
+              <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer">
+                <input type="checkbox" checked style="opacity:0;width:0;height:0">
+                <span onclick="this.parentElement.querySelector('input').checked=!this.parentElement.querySelector('input').checked;this.style.background=this.parentElement.querySelector('input').checked?'var(--teal-600)':'var(--gray-100)'" style="position:absolute;inset:0;background:var(--teal-600);border-radius:24px;transition:0.2s"><span style="position:absolute;left:2px;top:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:0.2s;transform:translateX(20px)"></span></span>
+              </label>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px">
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">Batas kuota hampir habis</div>
+                <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">Ingatkan saat sisa 1 analisis</div>
+              </div>
+              <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer">
+                <input type="checkbox" style="opacity:0;width:0;height:0">
+                <span onclick="this.parentElement.querySelector('input').checked=!this.parentElement.querySelector('input').checked;this.style.background=this.parentElement.querySelector('input').checked?'var(--teal-600)':'var(--gray-100)'" style="position:absolute;inset:0;background:var(--gray-100);border-radius:24px;transition:0.2s"><span style="position:absolute;left:2px;top:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:0.2s"></span></span>
+              </label>
+            </div>
+          </div>
+
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-text-secondary);margin-bottom:10px">Pemasaran</div>
+          <div style="background:var(--color-background-secondary);border-radius:14px;border:0.5px solid var(--color-border-tertiary);overflow:hidden">
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:0.5px solid var(--color-border-tertiary)">
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">Promo & penawaran</div>
+                <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">Diskon dan penawaran spesial</div>
+              </div>
+              <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer">
+                <input type="checkbox" checked style="opacity:0;width:0;height:0">
+                <span onclick="this.parentElement.querySelector('input').checked=!this.parentElement.querySelector('input').checked;this.style.background=this.parentElement.querySelector('input').checked?'var(--teal-600)':'var(--gray-100)'" style="position:absolute;inset:0;background:var(--teal-600);border-radius:24px;transition:0.2s"><span style="position:absolute;left:2px;top:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:0.2s;transform:translateX(20px)"></span></span>
+              </label>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px">
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">Update fitur baru</div>
+                <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">Info saat ada fitur baru diluncurkan</div>
+              </div>
+              <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer">
+                <input type="checkbox" style="opacity:0;width:0;height:0">
+                <span onclick="this.parentElement.querySelector('input').checked=!this.parentElement.querySelector('input').checked;this.style.background=this.parentElement.querySelector('input').checked?'var(--teal-600)':'var(--gray-100)'" style="position:absolute;inset:0;background:var(--gray-100);border-radius:24px;transition:0.2s"><span style="position:absolute;left:2px;top:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:0.2s"></span></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN: KEAMANAN -->
+    <div class="screen fade-in" id="screen-keamanan">
+      <div class="page-header">
+        <div class="back-btn" onclick="goTo('profile')">←</div>
+        <div class="page-title">Keamanan</div>
+      </div>
+      <div class="screen-scroll">
+        <div style="padding:20px">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-text-secondary);margin-bottom:10px">Password</div>
+          <div style="background:var(--color-background-secondary);border-radius:14px;border:0.5px solid var(--color-border-tertiary);overflow:hidden;margin-bottom:20px">
+            <div style="padding:16px">
+              <div style="margin-bottom:14px">
+                <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:6px">Password Lama</div>
+                <input type="password" placeholder="••••••••" style="width:100%;padding:11px 14px;border-radius:10px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--color-text-primary);outline:none">
+              </div>
+              <div style="margin-bottom:14px">
+                <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:6px">Password Baru</div>
+                <input type="password" placeholder="Min. 8 karakter" style="width:100%;padding:11px 14px;border-radius:10px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--color-text-primary);outline:none">
+              </div>
+              <div style="margin-bottom:16px">
+                <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:6px">Konfirmasi Password Baru</div>
+                <input type="password" placeholder="Ulangi password baru" style="width:100%;padding:11px 14px;border-radius:10px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--color-text-primary);outline:none">
+              </div>
+              <button class="btn-primary" style="margin-bottom:0" onclick="goTo('profile')">Ganti Password</button>
+            </div>
+          </div>
+
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-text-secondary);margin-bottom:10px">Keamanan Akun</div>
+          <div style="background:var(--color-background-secondary);border-radius:14px;border:0.5px solid var(--color-border-tertiary);overflow:hidden;margin-bottom:20px">
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:0.5px solid var(--color-border-tertiary)">
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">Autentikasi 2 Langkah</div>
+                <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">Keamanan ekstra dengan OTP via SMS</div>
+              </div>
+              <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer">
+                <input type="checkbox" style="opacity:0;width:0;height:0">
+                <span onclick="this.parentElement.querySelector('input').checked=!this.parentElement.querySelector('input').checked;this.style.background=this.parentElement.querySelector('input').checked?'var(--teal-600)':'var(--gray-100)'" style="position:absolute;inset:0;background:var(--gray-100);border-radius:24px;transition:0.2s"><span style="position:absolute;left:2px;top:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:0.2s"></span></span>
+              </label>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer">
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">Perangkat Terhubung</div>
+                <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">1 perangkat aktif</div>
+              </div>
+              <div style="color:var(--color-text-secondary)">›</div>
+            </div>
+          </div>
+
+          <div style="background:var(--red-50);border-radius:14px;border:0.5px solid var(--red-400);overflow:hidden">
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer">
+              <div style="flex:1;font-size:13px;color:var(--red-600);font-weight:500">Hapus Akun Permanen</div>
+              <div style="color:var(--red-400)">›</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN: PANDUAN -->
+    <div class="screen fade-in" id="screen-panduan">
+      <div class="page-header">
+        <div class="back-btn" onclick="goTo('profile')">←</div>
+        <div class="page-title">Panduan Penggunaan</div>
+      </div>
+      <div class="screen-scroll">
+        <div style="padding:20px">
+          <div style="background:linear-gradient(135deg,var(--teal-50),var(--blue-50));border-radius:14px;padding:16px;margin-bottom:20px;border:0.5px solid var(--teal-100);text-align:center">
+            <div style="font-size:28px;margin-bottom:8px">⚖️</div>
+            <div style="font-family:'DM Serif Display',serif;font-size:16px;color:var(--teal-800);margin-bottom:4px">Selamat datang di LegalEasier</div>
+            <div style="font-size:12px;color:var(--teal-600)">Ikuti 3 langkah mudah ini untuk mulai</div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+            <div style="background:var(--color-background-secondary);border-radius:14px;padding:14px 16px;border:0.5px solid var(--color-border-tertiary);display:flex;gap:14px;align-items:flex-start">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--teal-600);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0">1</div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--color-text-primary);margin-bottom:4px">Upload atau Scan Dokumen</div>
+                <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.5">Pilih file PDF/DOCX dari HP kamu, atau langsung foto dokumen fisik menggunakan kamera.</div>
+              </div>
+            </div>
+            <div style="background:var(--color-background-secondary);border-radius:14px;padding:14px 16px;border:0.5px solid var(--color-border-tertiary);display:flex;gap:14px;align-items:flex-start">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--teal-600);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0">2</div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--color-text-primary);margin-bottom:4px">Lihat Hasil Analisis</div>
+                <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.5">AI kami akan mendeteksi klausul berisiko, memberi ringkasan, dan menerjemahkan istilah hukum yang rumit.</div>
+              </div>
+            </div>
+            <div style="background:var(--color-background-secondary);border-radius:14px;padding:14px 16px;border:0.5px solid var(--color-border-tertiary);display:flex;gap:14px;align-items:flex-start">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--teal-600);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0">3</div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--color-text-primary);margin-bottom:4px">Tanya ke AI</div>
+                <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.5">Gunakan fitur Chat AI untuk bertanya langsung tentang isi dokumen — dalam bahasa sehari-hari.</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-text-secondary);margin-bottom:10px">FAQ</div>
+          <div style="background:var(--color-background-secondary);border-radius:14px;border:0.5px solid var(--color-border-tertiary);overflow:hidden;margin-bottom:20px">
+            <div style="padding:14px 16px;border-bottom:0.5px solid var(--color-border-tertiary)">
+              <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px">Apakah dokumenku aman?</div>
+              <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.5">Ya. Semua dokumen dienkripsi dan tidak dibagikan ke pihak ketiga manapun.</div>
+            </div>
+            <div style="padding:14px 16px;border-bottom:0.5px solid var(--color-border-tertiary)">
+              <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px">Apakah ini pengganti pengacara?</div>
+              <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.5">Tidak. LegalEasier bersifat informatif. Untuk keputusan hukum penting, tetap konsultasikan ke pengacara.</div>
+            </div>
+            <div style="padding:14px 16px">
+              <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px">Berapa batas analisis gratis?</div>
+              <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.5">5 analisis tanpa daftar, 10 analisis/bulan dengan akun gratis, dan tak terbatas dengan Pro.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN: UPGRADE -->
+    <div class="screen fade-in" id="screen-upgrade">
+      <div class="page-header">
+        <div class="back-btn" onclick="goTo('profile')">←</div>
+        <div class="page-title">Upgrade ke Pro</div>
+      </div>
+      <div class="screen-scroll">
+        <div style="background:linear-gradient(160deg,#085041,#1D9E75);padding:28px 24px 36px;text-align:center;position:relative;overflow:hidden">
+          <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.05)"></div>
+          <div style="font-size:36px;margin-bottom:12px">⚡</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:24px;color:#fff;margin-bottom:8px">LegalEasier Pro</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.7);line-height:1.5">Akses penuh tanpa batas untuk perlindungan hukummu</div>
+        </div>
+
+        <!-- Pricing Cards -->
+        <div style="padding:20px">
+          <!-- Monthly -->
+          <div style="background:var(--color-background-secondary);border-radius:16px;border:0.5px solid var(--color-border-tertiary);padding:16px;margin-bottom:12px;cursor:pointer" id="plan-monthly" onclick="selectPlan('monthly')">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <div style="font-size:14px;font-weight:600;color:var(--color-text-primary)">Bulanan</div>
+              <div style="width:20px;height:20px;border-radius:50%;border:2px solid var(--color-border-secondary);display:flex;align-items:center;justify-content:center" id="radio-monthly"></div>
+            </div>
+            <div style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--color-text-primary)">Rp 49.000<span style="font-size:14px;color:var(--color-text-secondary);font-family:'DM Sans',sans-serif">/bln</span></div>
+          </div>
+
+          <!-- Yearly (recommended) -->
+          <div style="background:var(--teal-50);border-radius:16px;border:2px solid var(--teal-400);padding:16px;margin-bottom:20px;cursor:pointer;position:relative" id="plan-yearly" onclick="selectPlan('yearly')">
+            <div style="position:absolute;top:-10px;right:16px;background:var(--teal-600);color:#fff;font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px">HEMAT 40%</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <div style="font-size:14px;font-weight:600;color:var(--teal-800)">Tahunan</div>
+              <div style="width:20px;height:20px;border-radius:50%;border:2px solid var(--teal-600);background:var(--teal-600);display:flex;align-items:center;justify-content:center" id="radio-yearly"><div style="width:8px;height:8px;border-radius:50%;background:#fff"></div></div>
+            </div>
+            <div style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--teal-800)">Rp 349.000<span style="font-size:14px;color:var(--teal-600);font-family:'DM Sans',sans-serif">/thn</span></div>
+            <div style="font-size:11px;color:var(--teal-600);margin-top:2px">≈ Rp 29.000/bulan · hemat Rp 239.000</div>
+          </div>
+
+          <!-- Benefits -->
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-text-secondary);margin-bottom:10px">Yang kamu dapatkan</div>
+          <div style="background:var(--color-background-secondary);border-radius:14px;border:0.5px solid var(--color-border-tertiary);padding:16px;margin-bottom:20px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;gap:10px"><span style="color:var(--teal-600);font-size:15px">✓</span><span style="font-size:13px;color:var(--color-text-primary)">Analisis dokumen <strong>tak terbatas</strong></span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="color:var(--teal-600);font-size:15px">✓</span><span style="font-size:13px;color:var(--color-text-primary)">Chat AI tanpa batas pertanyaan</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="color:var(--teal-600);font-size:15px">✓</span><span style="font-size:13px;color:var(--color-text-primary)">Perbandingan multi-dokumen</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="color:var(--teal-600);font-size:15px">✓</span><span style="font-size:13px;color:var(--color-text-primary)">Export laporan PDF profesional</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="color:var(--teal-600);font-size:15px">✓</span><span style="font-size:13px;color:var(--color-text-primary)">Prioritas dukungan pelanggan</span></div>
+          </div>
+
+          <button class="btn-primary" onclick="goTo('profile')" style="margin-bottom:10px">Mulai Coba Gratis 7 Hari</button>
+          <div style="text-align:center;font-size:11px;color:var(--color-text-secondary)">Batalkan kapan saja · Tidak perlu kartu kredit</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Nav bar labels outside phone for quick navigation -->
+<div style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:16px;padding:0 1rem">
+  <button onclick="goTo('onboarding')" style="font-size:11px;padding:5px 12px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--color-text-secondary)">Onboarding</button>
+  <button onclick="goTo('login')" style="font-size:11px;padding:5px 12px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--color-text-secondary)">Login</button>
+  <button onclick="goTo('home')" style="font-size:11px;padding:5px 12px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--color-text-secondary)">Home</button>
+  <button onclick="goTo('upload')" style="font-size:11px;padding:5px 12px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--color-text-secondary)">Upload</button>
+  <button onclick="goTo('detail')" style="font-size:11px;padding:5px 12px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--color-text-secondary)">Detail</button>
+  <button onclick="goTo('chat')" style="font-size:11px;padding:5px 12px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--color-text-secondary)">Chat AI</button>
+  <button onclick="goTo('history')" style="font-size:11px;padding:5px 12px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--color-text-secondary)">Riwayat</button>
+  <button onclick="goTo('limit')" style="font-size:11px;padding:5px 12px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--color-text-secondary)">Limit Gate</button>
+  <button onclick="goTo('profile')" style="font-size:11px;padding:5px 12px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--color-text-secondary)">Profil</button>
+</div>
+
+<script>
+function goTo(screen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('screen-' + screen);
+  if (el) { el.classList.add('active'); el.classList.remove('fade-in'); void el.offsetWidth; el.classList.add('fade-in'); }
+}
+
+function switchTab(tab) {
+  ['risiko','ringkasan','terjemahan'].forEach(t => {
+    document.getElementById('tab-'+t).classList.toggle('active', t===tab);
+    document.getElementById('panel-'+t).style.display = t===tab ? 'block' : 'none';
+  });
+}
+
+function toggleFilter(el) {
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+}
+
+const aiReplies = [
+  "Berdasarkan dokumen yang kamu upload, klausul tersebut memang perlu diperhatikan. Saya sarankan diskusikan langsung dengan HRD sebelum tanda tangan. 💡",
+  "Sesuai isi kontrakmu di Pasal 12, lembur harus dikompensasi minimal 1,5x gaji per jam sesuai UU No. 13/2003.",
+  "Hak kamu meliputi cuti tahunan 12 hari, BPJS Ketenagakerjaan & Kesehatan, serta THR setara 1 bulan gaji. Semuanya tercantum di Pasal 5-7.",
+  "Klausul non-kompetisi selama 3 tahun bisa dinegosiasi. Umumnya, perusahaan bersedia mempersingkat menjadi 1 tahun dengan batasan geografis yang jelas."
+];
+let replyIdx = 0;
+
+function selectPlan(plan) {
+  const monthly = document.getElementById('plan-monthly');
+  const yearly = document.getElementById('plan-yearly');
+  const radioM = document.getElementById('radio-monthly');
+  const radioY = document.getElementById('radio-yearly');
+  if (plan === 'monthly') {
+    monthly.style.border = '2px solid var(--teal-400)';
+    monthly.style.background = 'var(--teal-50)';
+    yearly.style.border = '0.5px solid var(--color-border-tertiary)';
+    yearly.style.background = 'var(--color-background-secondary)';
+    radioM.style.background = 'var(--teal-600)';
+    radioM.style.border = '2px solid var(--teal-600)';
+    radioM.innerHTML = '<div style="width:8px;height:8px;border-radius:50%;background:#fff"></div>';
+    radioY.style.background = 'transparent';
+    radioY.style.border = '2px solid var(--color-border-secondary)';
+    radioY.innerHTML = '';
+  } else {
+    yearly.style.border = '2px solid var(--teal-400)';
+    yearly.style.background = 'var(--teal-50)';
+    monthly.style.border = '0.5px solid var(--color-border-tertiary)';
+    monthly.style.background = 'var(--color-background-secondary)';
+    radioY.style.background = 'var(--teal-600)';
+    radioY.style.border = '2px solid var(--teal-600)';
+    radioY.innerHTML = '<div style="width:8px;height:8px;border-radius:50%;background:#fff"></div>';
+    radioM.style.background = 'transparent';
+    radioM.style.border = '2px solid var(--color-border-secondary)';
+    radioM.innerHTML = '';
+  }
+}
+
+function sendMsg(text) {
+  const input = document.getElementById('chat-input');
+  const msg = text || input.value.trim();
+  if (!msg) return;
+  const msgs = document.getElementById('chat-messages');
+
+  const userBubble = document.createElement('div');
+  userBubble.className = 'msg-bubble msg-user fade-in';
+  userBubble.textContent = msg;
+  msgs.appendChild(userBubble);
+  input.value = '';
+
+  const typingBubble = document.createElement('div');
+  typingBubble.className = 'msg-bubble msg-ai';
+  typingBubble.innerHTML = '<div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
+  msgs.appendChild(typingBubble);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  setTimeout(() => {
+    typingBubble.innerHTML = aiReplies[replyIdx % aiReplies.length];
+    typingBubble.classList.add('fade-in');
+    replyIdx++;
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 1200);
+}
+</script>
