@@ -21,7 +21,7 @@ LegalEasier adalah aplikasi mobile berbasis AI yang membantu masyarakat umum mem
 | Mobile         | Flutter 3.x + Riverpod             |
 | Backend API    | FastAPI (Python 3.11) + PostgreSQL |
 | NLP & AI       | SpaCy, NLTK, LangChain, ChromaDB   |
-| LLM            | Claude API (Anthropic)             |
+| LLM            | Adalah                             |
 | Auth & Storage | Firebase Auth + Firebase Storage   |
 
 ---
