@@ -10,19 +10,28 @@ LegalEasier adalah aplikasi mobile berbasis AI yang membantu masyarakat umum mem
 
 ## Status
 
-**In development** -- Minggu 1
+**Sprint 1** — In progress
+
+| Sprint | Fokus | Status |
+| ------ | ----- | ------ |
+| Sprint 1 | Auth (Flutter + Backend), OCR (NLP), Database schema | 🔄 In progress |
+| Sprint 2 | Upload dokumen, preprocessing, embedding | ⏳ Belum dimulai |
+| Sprint 3 | Analisis risiko LLM, detail dokumen | ⏳ Belum dimulai |
+| Sprint 4 | RAG chatbot, limit guest | ⏳ Belum dimulai |
+| Sprint 5 | History, UI polish | ⏳ Belum dimulai |
 
 ---
 
 ## Tech Stack
 
-| Layer          | Teknologi                          |
-| -------------- | ---------------------------------- |
-| Mobile         | Flutter 3.x + Riverpod             |
-| Backend API    | FastAPI (Python 3.11) + PostgreSQL |
-| NLP & AI       | SpaCy, NLTK, LangChain, ChromaDB   |
-| LLM            | Adalah                             |
-| Auth & Storage | Firebase Auth + Firebase Storage   |
+| Layer       | Teknologi                                                |
+| ----------- | ---------------------------------------------------------|
+| Mobile      | Flutter 3.x + Riverpod + go_router                       |
+| Backend API | FastAPI (Python 3.11) + PostgreSQL 16                    |
+| File Storage| PostgreSQL bytea — served via `GET /documents/{id}/file` |
+| NLP & AI    | PyMuPDF, Tesseract OCR, SpaCy, LangChain, ChromaDB       |
+| LLM         | Claude API (primary) + GPT-4 (fallback)                  |
+| Auth        | Firebase Auth (Google + Email/Password)                  |
 
 ---
 
@@ -52,11 +61,15 @@ LeagalEasier/
 │   │   ├── models/                  # SQLAlchemy models
 │   │   └── schemas/                 # Pydantic schemas
 │   └── alembic/                     # DB migrations
-├── nlp_pipeline/                    # NLP & AI microservice
-│   ├── llm/                         # LLM integration (Claude)
-│   ├── ocr/                         # Tesseract OCR
-│   ├── preprocessing/               # Text preprocessing
-│   └── rag/                         # Retrieval-Augmented Generation
+├── nlp_pipeline/                    # NLP & AI microservice (port 8001)
+│   ├── core/                        # Config (pydantic-settings)
+│   ├── ocr/                         # PyMuPDF + Tesseract OCR ✅ Sprint 1
+│   ├── preprocessing/               # Text preprocessing (Sprint 2)
+│   ├── rag/                         # Retrieval-Augmented Generation (Sprint 2)
+│   ├── llm/                         # LLM integration — Claude API (Sprint 3)
+│   ├── tests/                       # Unit tests
+│   ├── main.py                      # FastAPI entry point
+│   └── schemas.py                   # Pydantic schemas
 ├── database/                        # SQL schema & migrations
 │   └── migrations/
 ├── docker-compose.yml
@@ -97,13 +110,16 @@ Lalu ikuti instruksi di folder sesuai jobdesk masing-masing.
 
 ## Tim
 
-| Nama                 | NIM        | Jobdesk                              |
-| -------------------- | ---------- | ------------------------------------ |
-| Ester Faninta        | 2301020053 | Frontend: Flutter UI, Firebase Auth  |
-| Jamalludin           | 2301020075 | Backend: FastAPI, PostgreSQL         |
-| Fiana Wahyu Laura    | 2301020082 | Frontend: Flutter UI, Firebase Auth  |
-| Indra Sugara         | 2301020084 | AI/NLP: OCR, RAG, LLM, ChromaDB      |
-| Masry Ryzki Yanditar | 2301020087 | Backend: FastAPI, PostgreSQL         |
+| Nama                 | NIM        | Jobdesk                                              |
+| -------------------- | ---------- | ---------------------------------------------------- |
+| Ester Faninta        | 2301020053 | Frontend: Flutter UI, Firebase Auth                  |
+| Fiana Wahyu Laura    | 2301020082 | Frontend: Flutter UI, Firebase Auth                  |
+| Masry Ryzki Yanditar | 2301020087 | Backend: FastAPI, PostgreSQL, File Storage           |
+| Jamalludin           | 2301020075 | Backend: FastAPI, PostgreSQL, File Storage           |
+| Indra Sugara         | 2301020084 | AI/NLP: OCR, RAG, LLM, ChromaDB                      |
+
+> **Catatan:** File storage (dokumen upload) ditangani Backend via PostgreSQL bytea.
+> Frontend hanya kirim file sebagai multipart ke backend.
 
 ---
 
