@@ -20,7 +20,7 @@ pydantic-settings==2.5.0
 
 # NLP (Sprint 2+)
 spacy==3.7.0
-nltk==3.9.0
+nltk==3.9.1
 
 # Chunking & RAG (Sprint 2+)
 langchain==0.2.0
