@@ -3,7 +3,8 @@ schemas.py — LegalEasier NLP Pipeline
 Pydantic request/response schemas untuk NLP service.
 
 Rules (CLAUDE.md §8):
-- Semua endpoint harus mengembalikan format standar { success, data, message }.
+- Semua endpoint harus mengembalikan format standar { success, data, message } untuk endpoint OCR legacy.
+- Endpoint kontrak backend ↔ NLP memakai response JSON langsung sesuai `backend/docs/nlp_contract.md`.
 - Pydantic models untuk semua request dan response schema — no raw dicts.
 
 Sprint 1: OCR extraction schemas.
@@ -13,7 +14,7 @@ Sprint 2: Preprocessing + RAG (embed & store) schemas.
 
 from typing import Any, Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 # ---------------------------------------------------------------------------

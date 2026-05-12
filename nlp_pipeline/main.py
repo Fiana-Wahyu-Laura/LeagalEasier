@@ -128,6 +128,28 @@ def _validate_file_size(file_bytes: bytes) -> None:
         )
 
 
+def _build_nlp_contract_response(
+    doc_id: str,
+    normalized_type: str,
+    full_text: str,
+    ocr_used: bool,
+) -> NLPProcessResponse:
+    """Bangun response kontrak backend ↔ NLP menggunakan output OCR yang tersedia saat ini."""
+
+    return NLPProcessResponse(
+        document_id=doc_id,
+        ocr_used=ocr_used,
+        full_text=full_text,
+        summary=(
+            "Ringkasan sementara: dokumen berhasil diproses dan teks berhasil diekstrak. "
+            "Analisis lanjutan akan diisi pada Sprint 3."
+        ),
+        risk_score=0,
+        risk_clauses=[],
+        disclaimer="Hasil ini bersifat informatif dan bukan pengganti konsultasi hukum profesional.",
+    )
+
+
 # ---------------------------------------------------------------------------
 # Helper: OCR extraction (shared logic)
 # ---------------------------------------------------------------------------

@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     algorithm: str = Field(default="HS256", validation_alias="ALGORITHM")
     access_token_expire_minutes: int = Field(default=30, validation_alias="ACCESS_TOKEN_EXPIRE_MINUTES")
     nlp_service_url: AnyHttpUrl = Field(default="http://localhost:8001", validation_alias="NLP_SERVICE_URL")
+    storage_root: str = Field(default="storage", validation_alias="STORAGE_ROOT")
 
     model_config = SettingsConfigDict(
         env_file=ENV_FILE,
