@@ -9,6 +9,9 @@ Endpoints Sprint 1:
     GET  /health           → health check
     POST /ocr/extract      → OCR extraction (PyMuPDF + Tesseract fallback)
 
+Endpoints Sprint 2 contract:
+    POST /nlp/process      → backend ↔ NLP contract response
+
 Rules (CLAUDE.md):
 - Semua endpoint kecuali /health memerlukan validasi dari backend (Sprint 2+).
 - Semua response menggunakan format standar { success, data, message }.
@@ -27,7 +30,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from core.config import settings
 from ocr.image_ocr import extract_text_from_image, extract_text_from_pdf_scan
 from ocr.pdf_extractor import extract_text_from_pdf
-from schemas import HealthResponse, OCRResponse, StandardResponse
+from schemas import (
+    HealthResponse,
+    NLPProcessRequest,
+    NLPProcessResponse,
+    NLPRiskClause,
+    OCRResponse,
+    StandardResponse,
+)
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -104,6 +114,28 @@ def _validate_file_size(file_bytes: bytes) -> None:
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
             detail=f"Ukuran file melebihi batas maksimum {max_mb}MB.",
         )
+
+
+def _build_nlp_contract_response(
+    doc_id: str,
+    normalized_type: str,
+    full_text: str,
+    ocr_used: bool,
+) -> NLPProcessResponse:
+    """Bangun response kontrak backend ↔ NLP menggunakan output OCR yang tersedia saat ini."""
+
+    return NLPProcessResponse(
+        document_id=doc_id,
+        ocr_used=ocr_used,
+        full_text=full_text,
+        summary=(
+            "Ringkasan sementara: dokumen berhasil diproses dan teks berhasil diekstrak. "
+            "Analisis lanjutan akan diisi pada Sprint 3."
+        ),
+        risk_score=0,
+        risk_clauses=[],
+        disclaimer="Hasil ini bersifat informatif dan bukan pengganti konsultasi hukum profesional.",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -237,4 +269,71 @@ async def ocr_extract(
         success=True,
         data=ocr_data.model_dump(),
         message=f"Ekstraksi teks berhasil menggunakan {method}.",
+    )
+
+
+@app.post(
+    "/nlp/process",
+    response_model=NLPProcessResponse,
+    summary="Backend ↔ NLP contract endpoint",
+    tags=["NLP"],
+    status_code=status.HTTP_200_OK,
+)
+async def nlp_process(
+    file: UploadFile = File(..., description="File dokumen (PDF, JPG, PNG)."),
+    file_type: str = Form(..., description="Tipe file: 'pdf', 'jpg', 'jpeg', 'png'."),
+    document_id: str = Form(..., description="UUID dokumen dari backend."),
+) -> NLPProcessResponse:
+    """
+    Endpoint kontrak backend ↔ NLP.
+
+    Untuk saat ini, endpoint ini memakai pipeline OCR yang sama dengan `/ocr/extract`
+    dan mengembalikan response JSON langsung tanpa wrapper standar.
+    """
+
+    request_meta = NLPProcessRequest(document_id=document_id, file_type=_validate_file_type(file_type))
+    file_bytes: bytes = await file.read()
+    _validate_file_size(file_bytes)
+
+    normalized_type = request_meta.file_type
+
+    try:
+        if normalized_type == "pdf":
+            pdf_result = extract_text_from_pdf(file_bytes)
+
+            if pdf_result.full_text:
+                full_text = pdf_result.full_text
+                ocr_used = False
+            else:
+                logger.info(
+                    "PyMuPDF tidak menemukan teks pada '%s'. Fallback ke Tesseract OCR.",
+                    request_meta.document_id,
+                )
+                ocr_result = extract_text_from_pdf_scan(file_bytes)
+                full_text = ocr_result.full_text
+                ocr_used = True
+        else:
+            ocr_result = extract_text_from_image(file_bytes, file_type=normalized_type)
+            full_text = ocr_result.full_text
+            ocr_used = True
+
+    except ValueError as exc:
+        logger.warning("File tidak valid untuk dokumen '%s': %s", request_meta.document_id, exc)
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(exc),
+        ) from exc
+
+    except RuntimeError as exc:
+        logger.error("Runtime error saat memproses dokumen '%s': %s", request_meta.document_id, exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Gagal memproses dokumen. Silakan coba lagi atau hubungi administrator.",
+        ) from exc
+
+    return _build_nlp_contract_response(
+        doc_id=request_meta.document_id,
+        normalized_type=normalized_type,
+        full_text=full_text,
+        ocr_used=ocr_used,
     )
