@@ -236,3 +236,35 @@ class TestOcrExtractEndpoint:
             data={"file_type": "pdf"},
         )
         assert response.status_code == 413
+
+
+class TestNlpProcessContractEndpoint:
+    """Unit tests untuk endpoint kontrak backend ↔ NLP (/nlp/process)."""
+
+    @patch("main.extract_text_from_pdf")
+    def test_pdf_digital_returns_contract_payload(self, mock_extract: MagicMock) -> None:
+        """Endpoint kontrak harus mengembalikan JSON raw sesuai backend contract."""
+        long_text = "Kontrak kerja sama antara PT A dan PT B untuk proyek X." * 5
+        mock_extract.return_value = PDFExtractionResult(
+            full_text=long_text,
+            page_count=3,
+            ocr_used=False,
+            pages=[long_text],
+        )
+
+        fake_pdf = io.BytesIO(b"fake-pdf-content")
+        response = client.post(
+            "/nlp/process",
+            files={"file": ("dokumen.pdf", fake_pdf, "application/pdf")},
+            data={"file_type": "pdf", "document_id": "12345678-1234-5678-1234-567812345678"},
+        )
+
+        assert response.status_code == 200
+        body = response.json()
+        assert body["document_id"] == "12345678-1234-5678-1234-567812345678"
+        assert body["ocr_used"] is False
+        assert body["full_text"] == long_text
+        assert body["summary"]
+        assert body["risk_score"] == 0
+        assert body["risk_clauses"] == []
+        assert body["disclaimer"].startswith("Hasil ini bersifat informatif")

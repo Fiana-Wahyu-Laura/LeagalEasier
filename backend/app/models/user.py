@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import Boolean, Column, DateTime, String
 from sqlalchemy.dialects.postgresql import UUID
@@ -15,4 +15,8 @@ class User(Base):
     display_name: str | None = Column(String(255), nullable=True)
     hashed_password: str | None = Column(String(255), nullable=True)
     is_active: bool = Column(Boolean, default=True, nullable=False)
-    created_at: datetime = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
+    created_at: datetime = Column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
