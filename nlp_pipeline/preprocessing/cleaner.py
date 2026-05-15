@@ -14,30 +14,10 @@ Aturan:
 import re
 import unicodedata
 
-import nltk
-
-# Pastikan resource NLTK tersedia
-# Jalankan sekali: python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords')"
-try:
-    nltk.data.find("tokenizers/punkt")
-except LookupError:
-    nltk.download("punkt", quiet=True)
-
-try:
-    nltk.data.find("corpora/stopwords")
-except LookupError:
-    nltk.download("stopwords", quiet=True)
-
 
 # ---------------------------------------------------------------------------
 # Pola regex yang sering muncul di dokumen hukum Indonesia
 # ---------------------------------------------------------------------------
-
-# Nomor pasal: "Pasal 1", "Pasal 10 A", dst.
-_RE_PASAL = re.compile(r"Pasal\s+\d+\s*[A-Za-z]?", re.IGNORECASE)
-
-# Simbol mata uang yang tidak perlu (strip karakter non-standard)
-_RE_CURRENCY_NOISE = re.compile(r"[^\x00-\x7F\u00C0-\u024F\u2018\u2019\u201C\u201D\-–—]")
 
 # Baris kosong berlebih (lebih dari 2 baris)
 _RE_EXCESS_NEWLINES = re.compile(r"\n{3,}")
@@ -51,12 +31,6 @@ _RE_CONTROL_CHARS = re.compile(r"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]")
 # Header/footer berulang yang umum di dokumen hukum (nomor halaman, "Halaman X dari Y")
 _RE_PAGE_MARKER = re.compile(
     r"(?i)\bhalaman\s+\d+\s*(dari|of)\s+\d+\b|^\s*-\s*\d+\s*-\s*$",
-    re.MULTILINE,
-)
-
-# Tanda tangan / placeholder umum
-_RE_SIGNATURE_BLOCK = re.compile(
-    r"(?i)(tanda\s+tangan|ttd\.?|materai\s+rp[.,]?\s*[\d.]+)",
     re.MULTILINE,
 )
 
