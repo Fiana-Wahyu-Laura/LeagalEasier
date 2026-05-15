@@ -20,7 +20,6 @@ Aturan:
 
 import logging
 from dataclasses import dataclass, field
-from typing import Optional
 
 import spacy
 from spacy.language import Language
@@ -32,9 +31,12 @@ logger = logging.getLogger(__name__)
 # SpaCy model — lazy-loaded singleton agar tidak reload tiap request
 # ---------------------------------------------------------------------------
 
-_nlp_model: Optional[Language] = None
+_nlp_model: Language | None = None
 
 SPACY_MODEL_NAME = "xx_ent_wiki_sm"
+# SpaCy default max_length = 1_000_000 karakter. Dokumen hukum panjang bisa
+# melebihi batas ini. Set ke nilai yang aman untuk pipeline ini.
+_SPACY_MAX_LENGTH = 2_000_000  # 2 juta karakter
 
 
 def get_nlp_model() -> Language:
@@ -50,7 +52,10 @@ def get_nlp_model() -> Language:
     if _nlp_model is None:
         try:
             _nlp_model = spacy.load(SPACY_MODEL_NAME)
-            logger.info("SpaCy model '%s' berhasil dimuat.", SPACY_MODEL_NAME)
+            _nlp_model.max_length = _SPACY_MAX_LENGTH
+            if "sentencizer" not in _nlp_model.pipe_names:
+                _nlp_model.add_pipe("sentencizer")
+            logger.info("SpaCy model '%s' berhasil dimuat (max_length=%d).", SPACY_MODEL_NAME, _SPACY_MAX_LENGTH)
         except OSError as exc:
             raise RuntimeError(
                 f"SpaCy model '{SPACY_MODEL_NAME}' tidak ditemukan. "
@@ -88,6 +93,29 @@ class TokenizationResult:
 
 
 # ---------------------------------------------------------------------------
+# Helper internal
+# ---------------------------------------------------------------------------
+
+
+def _validate_text_input(text: str, fn_name: str) -> None:
+    """Validasi bahwa input adalah string tidak kosong.
+
+    Args:
+        text: Input yang akan divalidasi.
+        fn_name: Nama fungsi pemanggil (untuk pesan error yang jelas).
+
+    Raises:
+        ValueError: Jika text bukan str atau kosong.
+    """
+    if not isinstance(text, str):
+        raise ValueError(
+            f"{fn_name}: text harus bertipe str, bukan {type(text).__name__}."
+        )
+    if not text.strip():
+        raise ValueError(f"{fn_name}: text tidak boleh kosong.")
+
+
+# ---------------------------------------------------------------------------
 # Fungsi utama
 # ---------------------------------------------------------------------------
 
@@ -115,17 +143,9 @@ def tokenize_text(
         ValueError: Jika text bukan string atau kosong.
         RuntimeError: Jika SpaCy model tidak tersedia.
     """
-    if not isinstance(text, str):
-        raise ValueError(
-            f"text harus bertipe str, bukan {type(text).__name__}."
-        )
-    if not text.strip():
-        raise ValueError("text tidak boleh kosong.")
+    _validate_text_input(text, "tokenize_text")
 
     nlp = get_nlp_model()
-
-    # SpaCy memiliki batas default 1_000_000 karakter per doc
-    # Untuk dokumen hukum panjang, proses per chunk jika perlu
     doc: Doc = nlp(text)
 
     tokens: list[str] = []
@@ -133,13 +153,10 @@ def tokenize_text(
     pos_tags: list[str] = []
 
     for token in doc:
-        # Filter tanda baca jika diminta
         if not include_punctuation and token.is_punct:
             continue
-        # Filter whitespace token
         if token.is_space:
             continue
-        # Filter stopwords jika diminta
         if not include_stopwords and token.is_stop:
             continue
 
@@ -175,12 +192,7 @@ def extract_entities(text: str) -> list[dict[str, str]]:
         ValueError: Jika text bukan string atau kosong.
         RuntimeError: Jika SpaCy model tidak tersedia.
     """
-    if not isinstance(text, str):
-        raise ValueError(
-            f"text harus bertipe str, bukan {type(text).__name__}."
-        )
-    if not text.strip():
-        raise ValueError("text tidak boleh kosong.")
+    _validate_text_input(text, "extract_entities")
 
     nlp = get_nlp_model()
     doc: Doc = nlp(text)

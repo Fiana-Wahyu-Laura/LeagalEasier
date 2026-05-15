@@ -19,15 +19,6 @@ from unittest.mock import MagicMock, patch
 import pytest
 from fastapi.testclient import TestClient
 
-# ---------------------------------------------------------------------------
-# Setup: pastikan sys.path menemukan modul dari nlp_pipeline/
-# ---------------------------------------------------------------------------
-
-import sys
-import os
-
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from main import app
 from ocr.pdf_extractor import PDFExtractionResult, _is_text_valid, extract_text_from_pdf
 
