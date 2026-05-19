@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, DateTime, ForeignKey, Index, String, Text
+from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.models.base import Base
@@ -16,6 +16,9 @@ class Document(Base):
     storage_path: str = Column(String(2048), nullable=False)
     status: str = Column(String(32), nullable=False, default="pending")
     extracted_text: str | None = Column(Text, nullable=True)
+    summary: str | None = Column(Text, nullable=True)
+    risk_score: int | None = Column(Integer, nullable=True)
+    risk_clauses_json: str | None = Column(Text, nullable=True)
     created_at: datetime = Column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),

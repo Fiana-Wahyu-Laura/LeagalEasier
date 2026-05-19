@@ -98,6 +98,32 @@ class NLPServiceClient:
             logger.error(f"NLP service error for document {document_id}: {str(e)}")
             return None
 
+    async def delete_document_collection(
+        self,
+        document_id: UUID,
+    ) -> bool:
+        """
+        Delete NLP/vector collection for a document.
+
+        Failure here should not block document deletion.
+        """
+
+        try:
+            async with httpx.AsyncClient(timeout=30) as client:
+                response = await client.delete(
+                    f"{self.base_url}/nlp/{document_id}"
+                )
+
+                return response.status_code == 200
+
+        except Exception as e:
+            logger.error(
+                f"Failed to delete NLP collection for "
+                f"{document_id}: {e}"
+            )
+
+            # Do not raise error
+            return False
 
 def get_nlp_client() -> NLPServiceClient:
     """Dependency injection for NLP client."""

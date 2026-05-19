@@ -5,6 +5,7 @@ Documents API routes: upload, status, and text retrieval.
 import os
 import tempfile
 import uuid
+import json
 
 from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -89,6 +90,22 @@ async def upload_document(
         if 'tmp_path' in locals() and os.path.exists(tmp_path):
             os.remove(tmp_path)
 
+@router.get("", response_model=list[DocumentResponse])
+async def list_documents(
+    page: int = 1,
+    limit: int = 20,
+    db: AsyncSession = Depends(get_db),
+) -> list[DocumentResponse]:
+    offset = (page - 1) * limit
+    stmt = (
+        select(Document)
+        .order_by(Document.created_at.desc())
+        .offset(offset)
+        .limit(limit)
+    )
+    result = await db.execute(stmt)
+    documents = result.scalars().all()
+    return [DocumentResponse.model_validate(doc) for doc in documents]
 
 @router.get("/{document_id}", response_model=DocumentResponse)
 async def get_document(
@@ -157,6 +174,25 @@ async def get_document_text(
         status=document.status,
     )
 
+@router.delete("/{document_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_document(
+    document_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    storage: StorageService = Depends(get_storage_service),
+    nlp_client: NLPServiceClient = Depends(get_nlp_client),
+) -> None:
+    stmt = select(Document).where(Document.id == document_id)
+    result = await db.execute(stmt)
+    document = result.scalar_one_or_none()
+
+    if not document:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
+
+    storage.delete_file(document.storage_path)
+    await nlp_client.delete_document_collection(document_id)
+
+    await db.delete(document)
+    await db.commit()
 
 async def process_document_ocr(
     document_id: uuid.UUID,
@@ -185,6 +221,12 @@ async def process_document_ocr(
                 if nlp_result and nlp_result.full_text:
                     document.status = "done"
                     document.extracted_text = nlp_result.full_text
+                    document.summary = nlp_result.summary
+                    document.risk_score = nlp_result.risk_score
+                    document.risk_clauses_json = json.dumps(
+                        [rc.model_dump() for rc in nlp_result.risk_clauses],
+                        ensure_ascii=False,
+                    )
                 else:
                     document.status = "failed"
                     document.extracted_text = None

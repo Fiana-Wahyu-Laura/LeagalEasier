@@ -17,6 +17,8 @@ class DocumentResponse(BaseModel):
     storage_path: str
     status: str
     extracted_text: Optional[str] = None
+    summary: Optional[str] = None
+    risk_score: Optional[int] = None
     created_at: datetime
     updated_at: datetime
 
@@ -36,3 +38,16 @@ class DocumentTextResponse(BaseModel):
     id: uuid.UUID
     extracted_text: str
     status: str
+
+class RiskClauseResponse(BaseModel):
+    clause_text: str
+    plain_language: str
+    risk_level: str  # "Tinggi", "Sedang", "Rendah", "Aman"
+    confidence: float
+
+class DocumentAnalysisResponse(BaseModel):
+    document_id: uuid.UUID
+    summary: Optional[str] = None
+    risk_score: Optional[int] = None
+    risk_clauses: list[RiskClauseResponse] = []
+    disclaimer: str = "Hasil ini bersifat informatif dan bukan pengganti konsultasi hukum profesional."
