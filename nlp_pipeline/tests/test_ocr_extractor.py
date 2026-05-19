@@ -264,7 +264,8 @@ class TestNlpProcessContractEndpoint:
         assert body["document_id"] == "12345678-1234-5678-1234-567812345678"
         assert body["ocr_used"] is False
         assert body["full_text"] == long_text
-        assert body["summary"]
-        assert body["risk_score"] == 0
-        assert body["risk_clauses"] == []
+        # Sprint 2: LLM fields return empty/zero defaults (Sprint 3 akan isi nilai nyata)
+        assert isinstance(body["summary"], str)       # "" — Sprint 3 belum jalan
+        assert body["risk_score"] == 0                # 0 — belum dianalisis
+        assert body["risk_clauses"] == []             # [] — belum ada klausul
         assert body["disclaimer"].startswith("Hasil ini bersifat informatif")
