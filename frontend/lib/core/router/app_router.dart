@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:legaleasier/features/auth/presentation/HomeScreen.dart';
+import 'package:legaleasier/features/document/presentation/screens/home_screen.dart';
 import 'package:legaleasier/features/auth/presentation/LoginScreen.dart';
 import 'package:legaleasier/features/auth/presentation/RegisterScreen.dart';
 import 'package:legaleasier/features/onboarding/presentation/OnboardingScreen.dart';
