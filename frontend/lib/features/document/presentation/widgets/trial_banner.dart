@@ -14,7 +14,7 @@ class TrialBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.accentLight.withOpacity(0.2),
+        color: AppColors.accentLight.withValues(alpha: 0.2),
         border: Border.all(
           color: AppColors.accent,
           width: 1,

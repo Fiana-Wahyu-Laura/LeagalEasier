@@ -4,16 +4,18 @@ import 'package:legaleasier/features/document/domain/document.dart';
 
 /// Service untuk HTTP calls ke backend document endpoints
 class DocumentService {
+  static const _apiPrefix = '/api/v1';
+
   final Dio dio;
 
   DocumentService({required this.dio});
 
-  /// GET /documents?limit=10
+  /// GET /api/v1/documents?limit=10
   /// Fetch recent documents
   Future<List<Document>> fetchRecentDocuments({int limit = 10}) async {
     try {
       final response = await dio.get(
-        '/documents',
+        '$_apiPrefix/documents',
         queryParameters: {'limit': limit},
       );
 
@@ -27,18 +29,19 @@ class DocumentService {
         }
         return [];
       }
-      throw Exception('Failed to fetch recent documents: ${response.statusCode}');
+      throw Exception(
+          'Failed to fetch recent documents: ${response.statusCode}');
     } on DioException catch (e) {
       throw _handleDioError(e);
     }
   }
 
-  /// GET /documents?page=1&limit=20
+  /// GET /api/v1/documents?page=1&limit=20
   /// Fetch documents dengan pagination
   Future<List<Document>> fetchDocuments({int page = 1, int limit = 20}) async {
     try {
       final response = await dio.get(
-        '/documents',
+        '$_apiPrefix/documents',
         queryParameters: {'page': page, 'limit': limit},
       );
 
@@ -58,11 +61,11 @@ class DocumentService {
     }
   }
 
-  /// GET /documents/:id
+  /// GET /api/v1/documents/:id
   /// Fetch single document by ID
   Future<Document?> fetchDocumentById(String id) async {
     try {
-      final response = await dio.get('/documents/$id');
+      final response = await dio.get('$_apiPrefix/documents/$id');
 
       if (response.statusCode == 200) {
         final data = response.data;
@@ -80,7 +83,7 @@ class DocumentService {
     }
   }
 
-  /// POST /documents/upload
+  /// POST /api/v1/documents/upload
   /// Upload document file (multipart)
   Future<Document> uploadDocument(File file) async {
     try {
@@ -93,8 +96,13 @@ class DocumentService {
       });
 
       final response = await dio.post(
-        '/documents/upload',
+        '$_apiPrefix/documents/upload',
         data: formData,
+        options: Options(
+          contentType: Headers.multipartFormDataContentType,
+          sendTimeout: const Duration(minutes: 2),
+          receiveTimeout: const Duration(minutes: 2),
+        ),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -109,11 +117,11 @@ class DocumentService {
     }
   }
 
-  /// DELETE /documents/:id
+  /// DELETE /api/v1/documents/:id
   /// Delete document
   Future<void> deleteDocument(String id) async {
     try {
-      final response = await dio.delete('/documents/$id');
+      final response = await dio.delete('$_apiPrefix/documents/$id');
 
       if (response.statusCode != 200 && response.statusCode != 204) {
         throw Exception('Failed to delete document: ${response.statusCode}');
@@ -123,11 +131,11 @@ class DocumentService {
     }
   }
 
-  /// GET /documents/count
+  /// GET /api/v1/documents/count
   /// Get total document count
   Future<int> getDocumentCount() async {
     try {
-      final response = await dio.get('/documents/count');
+      final response = await dio.get('$_apiPrefix/documents/count');
 
       if (response.statusCode == 200) {
         final data = response.data;
@@ -142,12 +150,12 @@ class DocumentService {
     }
   }
 
-  /// GET /documents/search?q=query
+  /// GET /api/v1/documents/search?q=query
   /// Search documents
   Future<List<Document>> searchDocuments(String query) async {
     try {
       final response = await dio.get(
-        '/documents/search',
+        '$_apiPrefix/documents/search',
         queryParameters: {'q': query},
       );
 
@@ -171,13 +179,22 @@ class DocumentService {
   Exception _handleDioError(DioException error) {
     switch (error.type) {
       case DioExceptionType.connectionTimeout:
-      case DioExceptionType.receiveTimeout:
+        return Exception(
+          'Tidak bisa terhubung ke server. Pastikan backend berjalan dan URL backend benar.',
+        );
       case DioExceptionType.sendTimeout:
-        return Exception('Timeout saat berkomunikasi dengan server');
+        return Exception(
+          'Upload terlalu lama. Coba gunakan file yang lebih kecil atau koneksi yang lebih stabil.',
+        );
+      case DioExceptionType.receiveTimeout:
+        return Exception(
+          'Server terlalu lama merespons. Cek log backend, database, dan NLP service.',
+        );
       case DioExceptionType.badResponse:
         final statusCode = error.response?.statusCode;
         final message = error.response?.data['message'] as String?;
-        return Exception('Error: ${message ?? 'Request gagal (Code: $statusCode)'}');
+        return Exception(
+            'Error: ${message ?? 'Request gagal (Code: $statusCode)'}');
       case DioExceptionType.cancel:
         return Exception('Request dibatalkan');
       case DioExceptionType.unknown:

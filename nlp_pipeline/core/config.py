@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     # OCR config
     tesseract_lang: str = "ind+eng"          # Indonesian + English
     min_text_length: int = 50                # Threshold: teks dianggap valid jika >= 50 karakter
-    max_file_size_bytes: int = 20 * 1024 * 1024  # 20MB
+    max_file_size_bytes: int = 25 * 1024 * 1024  # 25MB (CLAUDE.md §8)
 
 
 settings = Settings()

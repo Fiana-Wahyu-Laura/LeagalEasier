@@ -1,20 +1,42 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:legaleasier/core/theme/app_theme.dart';
+import 'package:legaleasier/features/document/presentation/providers/document_provider.dart';
 
 /// Bottom sheet untuk upload atau scan dokumen
 /// Design: Radius 20px top, scan preview, 2 opsi (Kamera/Upload), 2 tombol (Batal/Ambil Foto)
-class UploadScanBottomSheet extends StatefulWidget {
-  const UploadScanBottomSheet({super.key});
+class UploadScanBottomSheet extends ConsumerStatefulWidget {
+  final UploadMethod initialMethod;
+
+  const UploadScanBottomSheet({
+    super.key,
+    this.initialMethod = UploadMethod.scan,
+  });
 
   @override
-  State<UploadScanBottomSheet> createState() => _UploadScanBottomSheetState();
+  ConsumerState<UploadScanBottomSheet> createState() =>
+      _UploadScanBottomSheetState();
 }
 
-class _UploadScanBottomSheetState extends State<UploadScanBottomSheet> {
-  UploadMethod _selectedMethod = UploadMethod.scan;
+class _UploadScanBottomSheetState extends ConsumerState<UploadScanBottomSheet> {
+  late UploadMethod _selectedMethod;
+  static const int _maxFileSizeBytes = 25 * 1024 * 1024;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedMethod = widget.initialMethod;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final uploadState = ref.watch(documentUploadProvider);
+    final isUploading = uploadState.isLoading;
+
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.white,
@@ -53,7 +75,7 @@ class _UploadScanBottomSheetState extends State<UploadScanBottomSheet> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
+                  const Text(
                     'Pilih metode untuk mengunggah dokumen Anda',
                     style: AppTextStyles.bodyMedium,
                   ),
@@ -76,11 +98,11 @@ class _UploadScanBottomSheetState extends State<UploadScanBottomSheet> {
                     color: AppColors.soft,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       width: 0.5,
                     ),
                   ),
-                  child: Center(
+                  child: const Center(
                     child: Icon(
                       Icons.folder_open_outlined,
                       size: 48,
@@ -164,16 +186,24 @@ class _UploadScanBottomSheetState extends State<UploadScanBottomSheet> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
-                        // TODO: Handle upload atau scan
-                        Navigator.of(context).pop();
-                      },
-                      child: Text(
-                        _selectedMethod == UploadMethod.scan
-                            ? 'Ambil Foto'
-                            : 'Pilih File',
-                        style: AppTextStyles.buttonText,
-                      ),
+                      onPressed: isUploading ? null : _handlePrimaryAction,
+                      child: isUploading
+                          ? const SizedBox(
+                              height: 18,
+                              width: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  AppColors.white,
+                                ),
+                              ),
+                            )
+                          : Text(
+                              _selectedMethod == UploadMethod.scan
+                                  ? 'Ambil Foto'
+                                  : 'Pilih File',
+                              style: AppTextStyles.buttonText,
+                            ),
                     ),
                   ),
                 ],
@@ -183,6 +213,94 @@ class _UploadScanBottomSheetState extends State<UploadScanBottomSheet> {
         ),
       ),
     );
+  }
+
+  Future<void> _handlePrimaryAction() async {
+    if (_selectedMethod == UploadMethod.scan) {
+      await _takePhotoAndUpload();
+      return;
+    }
+
+    await _pickFileAndUpload();
+  }
+
+  Future<void> _takePhotoAndUpload() async {
+    final messenger = ScaffoldMessenger.of(context);
+
+    try {
+      final picker = ImagePicker();
+      final photo = await picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 85,
+      );
+
+      if (photo == null) {
+        return;
+      }
+
+      await _uploadFile(File(photo.path));
+    } on Exception catch (error) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text('Gagal membuka kamera: $error')),
+      );
+    }
+  }
+
+  Future<void> _pickFileAndUpload() async {
+    final messenger = ScaffoldMessenger.of(context);
+
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: const ['pdf', 'png', 'jpg', 'jpeg', 'tiff'],
+        allowMultiple: false,
+      );
+
+      final path = result?.files.single.path;
+      if (path == null) {
+        return;
+      }
+
+      await _uploadFile(File(path));
+    } on Exception catch (error) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text('Gagal memilih file: $error')),
+      );
+    }
+  }
+
+  Future<void> _uploadFile(File file) async {
+    final messenger = ScaffoldMessenger.of(context);
+
+    try {
+      final fileSize = await file.length();
+      if (fileSize > _maxFileSizeBytes) {
+        if (!mounted) return;
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text('Ukuran file maksimal 25 MB.'),
+          ),
+        );
+        return;
+      }
+
+      final uploadedDocument =
+          await ref.read(documentUploadProvider.notifier).uploadDocument(file);
+
+      if (!mounted) return;
+      Navigator.of(context).pop(uploadedDocument);
+    } on Exception catch (error) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text('Upload gagal: ${_formatErrorMessage(error)}')),
+      );
+    }
+  }
+
+  String _formatErrorMessage(Object error) {
+    return error.toString().replaceFirst(RegExp(r'^Exception:\s*'), '');
   }
 
   /// Scan preview dengan corner brackets dan scan line
@@ -229,7 +347,7 @@ class _UploadScanBottomSheetState extends State<UploadScanBottomSheet> {
               width: 200,
               height: 2,
               decoration: BoxDecoration(
-                color: AppColors.accent.withOpacity(0.8),
+                color: AppColors.accent.withValues(alpha: 0.8),
                 borderRadius: BorderRadius.circular(1),
               ),
             ),
@@ -240,7 +358,7 @@ class _UploadScanBottomSheetState extends State<UploadScanBottomSheet> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
+                const Icon(
                   Icons.photo_camera_outlined,
                   size: 48,
                   color: AppColors.accent,
@@ -312,7 +430,7 @@ class _UploadScanBottomSheetState extends State<UploadScanBottomSheet> {
               height: 42,
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppColors.brand2.withOpacity(0.2)
+                    ? AppColors.brand2.withValues(alpha: 0.2)
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
               ),

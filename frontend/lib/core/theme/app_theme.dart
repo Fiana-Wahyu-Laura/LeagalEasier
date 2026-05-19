@@ -132,16 +132,16 @@ class AppTheme {
         seedColor: AppColors.brand,
         primary: AppColors.brand,
         secondary: AppColors.brand2,
-        background: AppColors.pageBackground,
+        surface: AppColors.pageBackground,
       ),
       scaffoldBackgroundColor: AppColors.pageBackground,
       
       // App Bar
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
         elevation: 0,
         backgroundColor: AppColors.white,
         surfaceTintColor: Colors.transparent,
-        iconTheme: const IconThemeData(color: AppColors.text1),
+        iconTheme: IconThemeData(color: AppColors.text1),
         titleTextStyle: AppTextStyles.screenTitle,
         centerTitle: false,
       ),
@@ -227,8 +227,8 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
-          side: BorderSide(
-            color: Colors.black.withOpacity(0.07),
+          side: const BorderSide(
+            color: Color.fromRGBO(0, 0, 0, 0.07),
             width: 0.5,
           ),
         ),
@@ -243,9 +243,9 @@ class AppTheme {
       ),
 
       // Bottom Sheet
-      bottomSheetTheme: BottomSheetThemeData(
+      bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.white,
-        shape: const RoundedRectangleBorder(
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),

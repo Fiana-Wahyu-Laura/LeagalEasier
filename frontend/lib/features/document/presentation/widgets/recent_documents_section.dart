@@ -25,7 +25,7 @@ class RecentDocumentsSection extends StatelessWidget {
             color: AppColors.white,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               width: 0.5,
             ),
           ),
@@ -33,7 +33,7 @@ class RecentDocumentsSection extends StatelessWidget {
           child: Center(
             child: Column(
               children: [
-                Icon(
+                const Icon(
                   Icons.file_copy_outlined,
                   size: 48,
                   color: AppColors.text3,
@@ -46,7 +46,7 @@ class RecentDocumentsSection extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
+                const Text(
                   'Upload dokumen pertama Anda sekarang',
                   style: AppTextStyles.meta,
                   textAlign: TextAlign.center,

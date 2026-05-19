@@ -10,7 +10,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 
 
-FileType = Literal["pdf", "jpg", "png", "docx"]
+FileType = Literal["pdf", "jpg", "png", "tiff"]
 RiskLevel = Literal["Tinggi", "Sedang", "Rendah", "Aman"]
 
 

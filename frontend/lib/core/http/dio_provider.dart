@@ -1,10 +1,16 @@
 import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Global Dio provider untuk HTTP requests
 final dioProvider = Provider<Dio>((ref) {
-  const baseUrl = 'http://10.0.2.2:8000';  // Android emulator localhost
-  
+  const configuredBackendBaseUrl = String.fromEnvironment('BACKEND_BASE_URL');
+  final backendBaseUrl = configuredBackendBaseUrl.isNotEmpty
+      ? configuredBackendBaseUrl
+      : _defaultBackendBaseUrl();
+  final baseUrl = _buildBackendBaseUrl(backendBaseUrl);
+
   final dio = Dio(
     BaseOptions(
       baseUrl: baseUrl,
@@ -17,6 +23,30 @@ final dioProvider = Provider<Dio>((ref) {
       },
     ),
   );
+
+  dio.interceptors.add(
+    InterceptorsWrapper(
+      onRequest: (options, handler) async {
+        final user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          final idToken = await user.getIdToken();
+          options.headers['Authorization'] = 'Bearer $idToken';
+        }
+        return handler.next(options);
+      },
+    ),
+  );
+
+  if (kDebugMode) {
+    dio.interceptors.add(
+      LogInterceptor(
+        requestHeader: false,
+        requestBody: false,
+        responseHeader: false,
+        responseBody: false,
+      ),
+    );
+  }
 
   // TODO: Add interceptor untuk JWT token
   // dio.interceptors.add(
@@ -34,3 +64,25 @@ final dioProvider = Provider<Dio>((ref) {
 
   return dio;
 });
+
+String _defaultBackendBaseUrl() {
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+    return 'http://127.0.0.1:8000';
+  }
+
+  return 'http://127.0.0.1:8000';
+}
+
+String _buildBackendBaseUrl(String backendBaseUrl) {
+  final normalizedBaseUrl = backendBaseUrl.replaceFirst(RegExp(r'/+$'), '');
+  const apiPrefix = '/api/v1';
+
+  if (normalizedBaseUrl.endsWith(apiPrefix)) {
+    return normalizedBaseUrl.substring(
+      0,
+      normalizedBaseUrl.length - apiPrefix.length,
+    );
+  }
+
+  return normalizedBaseUrl;
+}

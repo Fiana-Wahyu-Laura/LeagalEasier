@@ -22,7 +22,7 @@ app.add_middleware(
 app.include_router(health_router, prefix=settings.api_v1_prefix)
 app.include_router(documents_router, prefix=settings.api_v1_prefix)
 app.include_router(auth_router, prefix=settings.api_v1_prefix)
-app.include_router(analysis_router)
+app.include_router(analysis_router, prefix=settings.api_v1_prefix)
 
 
 @app.get("/")
@@ -31,3 +31,4 @@ async def root() -> dict[str, str]:
         "message": "LegalEasier backend is running",
         "version": "v0.1.0",
     }
+
