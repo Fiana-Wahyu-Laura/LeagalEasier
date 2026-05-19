@@ -10,10 +10,14 @@ Endpoints Sprint 1:
     POST /ocr/extract      → OCR extraction (PyMuPDF + Tesseract fallback)
 
 Endpoints Sprint 2:
-    POST /nlp/process      → Pipeline lengkap: OCR → preprocess → chunk → embed → store
+    POST /nlp/process      → Pipeline lengkap: OCR → preprocess → chunk → embed → store → LLM
     POST /nlp/retrieve     → Semantic search untuk RAG context (debug/internal)
     GET  /nlp/info/{id}    → Info collection ChromaDB untuk satu dokumen
     DELETE /nlp/{id}       → Hapus collection ChromaDB saat dokumen dihapus
+
+Sprint 3:
+    Langkah 7 ditambahkan ke POST /nlp/process:
+    → LLM analysis (risk detection, plain language, summary, score)
 
 Rules (CLAUDE.md):
 - Semua endpoint kecuali /health memerlukan validasi dari backend (Sprint 2+).
@@ -38,8 +42,10 @@ from preprocessing.splitter import split_text
 from preprocessing.tokenizer import tokenize_text
 from rag.chunker import chunk_text
 from rag.embedder import embed_chunks
-from rag.retriever import retrieve_relevant_chunks
+from rag.retriever import retrieve_all_chunks, retrieve_relevant_chunks
 from rag.vector_store import delete_document_collection, get_collection_info, store_chunks
+from llm.analyzer import analyze_document
+from llm.risk_scorer import compute_risk_score
 from schemas import (
     EmbedStoreResult,
     HealthResponse,
@@ -48,6 +54,7 @@ from schemas import (
     ProcessResponse,
     RetrieveRequest,
     RetrieveResponse,
+    RiskClauseSchema,
     StandardResponse,
 )
 
@@ -128,26 +135,6 @@ def _validate_file_size(file_bytes: bytes) -> None:
         )
 
 
-def _build_nlp_contract_response(
-    doc_id: str,
-    normalized_type: str,
-    full_text: str,
-    ocr_used: bool,
-) -> NLPProcessResponse:
-    """Bangun response kontrak backend ↔ NLP menggunakan output OCR yang tersedia saat ini."""
-
-    return NLPProcessResponse(
-        document_id=doc_id,
-        ocr_used=ocr_used,
-        full_text=full_text,
-        summary=(
-            "Ringkasan sementara: dokumen berhasil diproses dan teks berhasil diekstrak. "
-            "Analisis lanjutan akan diisi pada Sprint 3."
-        ),
-        risk_score=0,
-        risk_clauses=[],
-        disclaimer="Hasil ini bersifat informatif dan bukan pengganti konsultasi hukum profesional.",
-    )
 
 
 # ---------------------------------------------------------------------------
@@ -304,8 +291,8 @@ async def ocr_extract(
 
 @app.post(
     "/nlp/process",
-    response_model=StandardResponse,
-    summary="Full NLP Pipeline (OCR → Preprocess → Chunk → Embed → Store)",
+    response_model=ProcessResponse,
+    summary="Full NLP Pipeline (OCR → Preprocess → Chunk → Embed → Store → LLM Analysis)",
     tags=["NLP Pipeline"],
     status_code=status.HTTP_200_OK,
 )
@@ -313,9 +300,9 @@ async def nlp_process(
     file: UploadFile = File(..., description="File dokumen (PDF, JPG, PNG)."),
     file_type: str = Form(..., description="Tipe file: 'pdf', 'jpg', 'jpeg', 'png'."),
     document_id: str = Form(..., description="UUID dokumen dari backend (wajib)."),
-) -> StandardResponse:
+) -> ProcessResponse:
     """
-    Pipeline NLP lengkap untuk satu dokumen (CLAUDE.md §9):
+    Pipeline NLP lengkap untuk satu dokumen (CLAUDE.md §9).
 
     Langkah 1: OCR / text extraction (PyMuPDF + Tesseract fallback)
     Langkah 2: Cleaning & normalization (cleaner.clean_legal_text)
@@ -323,10 +310,10 @@ async def nlp_process(
     Langkah 4: Chunking (LangChain, 512 karakter, overlap 50)
     Langkah 5: Embedding (sentence-transformers all-MiniLM-L6-v2)
     Langkah 6: Store vectors ke ChromaDB (collection: doc_{uuid})
+    Langkah 7: LLM analysis (risk detection, plain language, summary, score)
 
-    Langkah 7 (LLM analysis) → Sprint 3.
-
-    Response sesuai API contract CLAUDE.md §18.
+    Response: flat JSON sesuai API contract Backend ↔ NLP (CLAUDE.md §18).
+    Tidak menggunakan StandardResponse wrapper — ini internal service-to-service call.
     """
     if not document_id or not document_id.strip():
         raise HTTPException(
@@ -346,7 +333,7 @@ async def nlp_process(
     )
 
     # ── Langkah 1: OCR ──────────────────────────────────────────────────
-    logger.info("[%s] Langkah 1/6: OCR extraction...", document_id)
+    logger.info("[%s] Langkah 1/7: OCR extraction...", document_id)
     ocr_data = await _run_ocr(file_bytes, normalized_type, document_id)
 
     if not ocr_data.full_text.strip():
@@ -359,7 +346,7 @@ async def nlp_process(
         )
 
     # ── Langkah 2: Cleaning ─────────────────────────────────────────────
-    logger.info("[%s] Langkah 2/6: Text cleaning...", document_id)
+    logger.info("[%s] Langkah 2/7: Text cleaning...", document_id)
     try:
         cleaned_text = clean_legal_text(ocr_data.full_text, expand_abbreviations=False)
     except ValueError as exc:
@@ -370,7 +357,7 @@ async def nlp_process(
         ) from exc
 
     # ── Langkah 3: Tokenization + Sentence Splitting ─────────────────────
-    logger.info("[%s] Langkah 3/6: Tokenization & sentence splitting...", document_id)
+    logger.info("[%s] Langkah 3/7: Tokenization & sentence splitting...", document_id)
     try:
         token_result = tokenize_text(cleaned_text)
         split_result = split_text(cleaned_text, method="nltk")
@@ -389,7 +376,7 @@ async def nlp_process(
     )
 
     # ── Langkah 4: Chunking ──────────────────────────────────────────────
-    logger.info("[%s] Langkah 4/6: Chunking...", document_id)
+    logger.info("[%s] Langkah 4/7: Chunking...", document_id)
     try:
         chunk_result = chunk_text(cleaned_text)
     except ValueError as exc:
@@ -401,7 +388,7 @@ async def nlp_process(
 
     # ── Langkah 5: Embedding ─────────────────────────────────────────────
     logger.info(
-        "[%s] Langkah 5/6: Embedding %d chunk...", document_id, chunk_result.chunk_count
+        "[%s] Langkah 5/7: Embedding %d chunk...", document_id, chunk_result.chunk_count
     )
     try:
         embeddings = embed_chunks(chunk_result.chunks)
@@ -413,7 +400,7 @@ async def nlp_process(
         ) from exc
 
     # ── Langkah 6: Store ke ChromaDB ─────────────────────────────────────
-    logger.info("[%s] Langkah 6/6: Storing ke ChromaDB...", document_id)
+    logger.info("[%s] Langkah 6/7: Storing ke ChromaDB...", document_id)
     collection_name = f"doc_{document_id.replace('-', '_')}"
     try:
         stored_count = store_chunks(
@@ -436,36 +423,61 @@ async def nlp_process(
         collection_name=collection_name,
     )
 
-    # ── Compose response ──────────────────────────────────────────────────
+    # ── Langkah 7: LLM Analysis (Sprint 3) ──────────────────────────────
+    logger.info("[%s] Langkah 7/7: LLM risk analysis...", document_id)
+
+    # Ambil semua chunk dari ChromaDB sebagai context untuk LLM
+    # (CLAUDE.md §9: "never ask LLM about document without providing chunks")
+    all_chunks = retrieve_all_chunks(document_id)
+    if not all_chunks:
+        # Fallback: gunakan chunk_result.chunks jika retrieve gagal
+        all_chunks = chunk_result.chunks
+
+    analysis_result = analyze_document(
+        document_id=document_id,
+        context_chunks=all_chunks,
+    )
+
+    # Hitung risk score dari klausul berisiko
+    risk_score = compute_risk_score(analysis_result.risk_clauses)
+
+    # Konversi RiskClause dataclass → RiskClauseSchema Pydantic model
+    risk_clause_schemas = [
+        RiskClauseSchema(
+            clause_text=rc.clause_text,
+            plain_language=rc.plain_language,
+            risk_level=rc.risk_level,
+            confidence=rc.confidence,
+        )
+        for rc in analysis_result.risk_clauses
+    ]
+
+    # ── Compose response ───────────────────────────────────────────
     process_response = ProcessResponse(
         document_id=document_id,
         ocr_used=ocr_data.ocr_used,
         full_text=cleaned_text,
         preprocessing=preprocessing_result,
         embed_store=embed_store_result,
-        # Sprint 3 fields — belum diisi
-        summary=None,
-        risk_score=None,
-        risk_clauses=None,
+        summary=analysis_result.summary,
+        risk_score=risk_score,
+        risk_clauses=risk_clause_schemas,
+        disclaimer=analysis_result.disclaimer,
     )
 
     logger.info(
-        "[%s] NLP pipeline selesai: %d token, %d kalimat, %d chunk disimpan.",
+        "[%s] NLP pipeline selesai: %d token, %d kalimat, %d chunk, "
+        "%d klausul berisiko, risk_score=%d.",
         document_id,
         token_result.token_count,
         split_result.sentence_count,
         stored_count,
+        len(risk_clause_schemas),
+        risk_score,
     )
 
-    return StandardResponse(
-        success=True,
-        data=process_response.model_dump(),
-        message=(
-            f"Pipeline NLP berhasil: {token_result.token_count} token, "
-            f"{split_result.sentence_count} kalimat, "
-            f"{stored_count} chunk disimpan ke ChromaDB."
-        ),
-    )
+    # Return flat JSON — sesuai API contract Backend ↔ NLP (CLAUDE.md §18).
+    return process_response
 
 
 @app.post(

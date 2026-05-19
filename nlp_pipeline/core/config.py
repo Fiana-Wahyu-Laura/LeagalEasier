@@ -19,6 +19,11 @@ class Settings(BaseSettings):
     # LLM API Keys (Sprint 3+)
     claude_api_key: str = ""
     openai_api_key: str = ""
+    nim_api_key: str = ""
+
+    # NVIDIA NIM (OpenAI-compatible)
+    nim_base_url: str = "https://integrate.api.nvidia.com/v1"
+    nim_model: str = "openai/gpt-oss-120b"
 
     # ChromaDB (Sprint 2+)
     chroma_persist_dir: str = "./chroma_db"
