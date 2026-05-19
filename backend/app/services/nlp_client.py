@@ -23,7 +23,8 @@ class NLPServiceClient:
 
     def __init__(self):
         self.settings = get_settings()
-        self.base_url = str(self.settings.nlp_service_url)
+        # Remove trailing slash from base_url to avoid double slashes in endpoints
+        self.base_url = str(self.settings.nlp_service_url).rstrip("/")
         self.timeout = 300  # 5 minutes for OCR processing
 
     @staticmethod
@@ -47,7 +48,8 @@ class NLPServiceClient:
     async def process_document(
         self,
         document_id: UUID,
-        file_path: str,
+        file_content: bytes,
+        filename: str,
     ) -> Optional[NLPProcessResponse]:
         """
         Send document to NLP service for OCR + analysis processing.
@@ -57,39 +59,43 @@ class NLPServiceClient:
         - file_type: pdf|jpg|png|docx
         - file: binary file bytes
 
+        Args:
+            document_id: UUID of the document
+            file_content: Binary content of the file (from PostgreSQL BYTEA)
+            filename: Original filename (for extension detection)
+
         Returns the parsed JSON payload from NLP or None if the service fails.
         """
         try:
-            file_type = self._detect_file_type(file_path)
+            file_type = self._detect_file_type(filename)
             request = NLPProcessRequest(document_id=document_id, file_type=file_type)
 
             async with httpx.AsyncClient(timeout=self.timeout) as client:
-                with open(file_path, "rb") as f:
-                    files = {
-                        "file": (
-                            Path(file_path).name,
-                            f,
-                            self._mime_type_for_file_type(request.file_type),
-                        )
-                    }
-                    data = {
-                        "document_id": str(request.document_id),
-                        "file_type": request.file_type,
-                    }
-
-                    response = await client.post(
-                        f"{self.base_url}/nlp/process",
-                        files=files,
-                        data=data,
+                files = {
+                    "file": (
+                        filename,
+                        file_content,
+                        self._mime_type_for_file_type(request.file_type),
                     )
+                }
+                data = {
+                    "document_id": str(request.document_id),
+                    "file_type": request.file_type,
+                }
 
-                    if response.status_code == 200:
-                        return NLPProcessResponse.model_validate(response.json())
-                    else:
-                        logger.error(
-                            f"NLP service error for {document_id}: {response.status_code} {response.text}"
-                        )
-                        return None
+                response = await client.post(
+                    f"{self.base_url}/nlp/process",
+                    files=files,
+                    data=data,
+                )
+
+                if response.status_code == 200:
+                    return NLPProcessResponse.model_validate(response.json())
+                else:
+                    logger.error(
+                        f"NLP service error for {document_id}: {response.status_code} {response.text}"
+                    )
+                    return None
 
         except httpx.TimeoutException:
             logger.error(f"NLP service timeout for document {document_id}")

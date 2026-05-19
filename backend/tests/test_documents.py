@@ -12,7 +12,8 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import delete
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
 
 from app.api.deps import get_current_user, get_db
 from app.api.routes.documents import get_nlp_client, get_storage_service
@@ -25,7 +26,7 @@ from app.services.storage import StorageService
 
 
 class MockNLPClient:
-    async def process_document(self, document_id: uuid.UUID, file_path: str) -> NLPProcessResponse:
+    async def process_document(self, document_id: uuid.UUID, file_content: bytes, filename: str) -> NLPProcessResponse:
         return NLPProcessResponse(
             document_id=document_id,
             ocr_used=True,
@@ -80,7 +81,7 @@ def wait_for_status(document_id: uuid.UUID, expected_status: str, timeout_second
     async def _wait() -> dict | None:
         settings = get_settings()
         engine = create_async_engine(str(settings.database_url), future=True)
-        SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
+        SessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
         deadline = time.time() + timeout_seconds
         last_payload = None
 

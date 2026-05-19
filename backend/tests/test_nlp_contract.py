@@ -5,7 +5,6 @@ Unit test for the backend ↔ NLP service contract.
 from __future__ import annotations
 
 import uuid
-from pathlib import Path
 
 import asyncio
 
@@ -56,17 +55,17 @@ class DummyAsyncClient:
         return DummyResponse()
 
 
-def test_nlp_client_sends_expected_contract(monkeypatch, tmp_path: Path):
+def test_nlp_client_sends_expected_contract(monkeypatch):
     monkeypatch.setattr(nlp_client_module.httpx, "AsyncClient", DummyAsyncClient)
 
-    sample_file = tmp_path / "sample.pdf"
-    sample_file.write_bytes(b"%PDF-1.4\ncontract test")
+    sample_content = b"%PDF-1.4\ncontract test"
 
     client = NLPServiceClient()
     result = asyncio.run(
         client.process_document(
             document_id=uuid.UUID("12345678-1234-5678-1234-567812345678"),
-            file_path=str(sample_file),
+            file_content=sample_content,
+            filename="sample.pdf",
         )
     )
 

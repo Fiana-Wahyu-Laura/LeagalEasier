@@ -77,7 +77,7 @@ async def upload_document(
         await db.refresh(document)
 
         # Schedule OCR processing (background task)
-        background_tasks.add_task(process_document_ocr, doc_id, storage_path, storage, nlp_client)
+        background_tasks.add_task(process_document_ocr, doc_id, file.filename, nlp_client)
 
         return DocumentResponse.model_validate(document)
 
@@ -197,20 +197,28 @@ async def delete_document(
 
 async def process_document_ocr(
     document_id: uuid.UUID,
-    storage_path: str,
-    storage: StorageService,
+    filename: str,
     nlp_client: NLPServiceClient,
 ) -> None:
     """
     Background task to process document OCR.
-    Calls NLP service (Indra's responsibility) and updates DB with result.
+    Fetches file content from database and calls NLP service (Indra's responsibility).
     """
     from app.db.session import AsyncSessionLocal
     try:
-        file_path = str(storage.get_file_path(storage_path))
+        # Fetch document from database to get file_content
+        async with AsyncSessionLocal() as db:
+            stmt = select(Document).where(Document.id == document_id)
+            result = await db.execute(stmt)
+            document = result.scalar_one_or_none()
+            
+            if not document or not document.file_content:
+                raise ValueError(f"Document {document_id} not found or has no file content")
+            
+            file_content = document.file_content
 
-        # Call NLP service for OCR + analysis
-        nlp_result = await nlp_client.process_document(document_id, file_path)
+        # Call NLP service for OCR + analysis with file bytes from database
+        nlp_result = await nlp_client.process_document(document_id, file_content, filename)
 
         # Update document status and text in DB
         async with AsyncSessionLocal() as db:
