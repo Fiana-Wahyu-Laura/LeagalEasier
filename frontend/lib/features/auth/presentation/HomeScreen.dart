@@ -15,16 +15,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool _isSigningOut = false;
 
   Future<void> _signOut() async {
+    final router = GoRouter.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+
     setState(() {
       _isSigningOut = true;
     });
     try {
       await ref.read(authNotifierProvider.notifier).logout();
       if (!mounted) return;
-      context.go('/login');
+      router.go('/login');
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         SnackBar(
           content: Text(
             error.toString(),
@@ -34,10 +37,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       );
     } finally {
-      if (!mounted) return;
-      setState(() {
-        _isSigningOut = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isSigningOut = false;
+        });
+      }
     }
   }
 

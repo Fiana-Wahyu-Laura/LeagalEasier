@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:legaleasier/core/http/dio_provider.dart';
 import 'package:legaleasier/features/document/data/document_service.dart';
@@ -57,13 +59,15 @@ class DocumentUploadNotifier
 
   DocumentUploadNotifier(this.repository) : super(const AsyncValue.data(null));
 
-  Future<void> uploadDocument(dynamic file) async {
+  Future<Document> uploadDocument(File file) async {
     state = const AsyncValue.loading();
     try {
       final result = await repository.uploadDocument(file);
       state = AsyncValue.data(result);
+      return result;
     } catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace);
+      rethrow;
     }
   }
 

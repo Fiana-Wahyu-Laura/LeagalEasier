@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:legaleasier/core/theme/app_theme.dart';
 import 'package:legaleasier/features/auth/presentation/providers/auth_provider.dart';
+import 'package:legaleasier/features/document/domain/document.dart';
 import 'package:legaleasier/features/document/presentation/widgets/quick_action_card.dart';
 import 'package:legaleasier/features/document/presentation/widgets/trial_banner.dart';
 import 'package:legaleasier/features/document/presentation/widgets/recent_documents_section.dart';
@@ -40,10 +41,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       );
     } finally {
-      if (!mounted) return;
-      setState(() {
-        _isSigningOut = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isSigningOut = false;
+        });
+      }
     }
   }
 
@@ -76,7 +78,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Container(
                   width: 36,
                   height: 36,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: AppColors.white,
                     shape: BoxShape.circle,
                   ),
@@ -136,7 +138,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(height: 24),
 
               // Quick stats (3 stat boxes)
-              Row(
+              const Row(
                 children: [
                   Expanded(
                     child: StatBox(
@@ -144,14 +146,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       label: 'Dokumen',
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   Expanded(
                     child: StatBox(
                       number: '0',
                       label: 'Berisiko',
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   Expanded(
                     child: StatBox(
                       number: '5',
@@ -182,11 +184,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     iconColor: AppColors.uploadIcon,
                     bgColor: AppColors.uploadBg,
                     title: 'Upload\nDokumen',
-                    onTap: () {
-                      showModalBottomSheet(
+                    onTap: () async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      final result = await showModalBottomSheet<Document>(
                         context: context,
                         isScrollControlled: true,
-                        builder: (_) => const UploadScanBottomSheet(),
+                        builder: (_) => const UploadScanBottomSheet(
+                          initialMethod: UploadMethod.file,
+                        ),
+                      );
+
+                      if (!mounted || result == null) {
+                        return;
+                      }
+
+                      messenger.showSnackBar(
+                        const SnackBar(
+                          content: Text('Dokumen berhasil diupload.'),
+                        ),
                       );
                     },
                   ),
@@ -195,8 +210,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     iconColor: AppColors.scanIcon,
                     bgColor: AppColors.scanBg,
                     title: 'Scan\nDokumen',
-                    onTap: () {
-                      // TODO: Open camera
+                    onTap: () async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      final result = await showModalBottomSheet<Document>(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (_) => const UploadScanBottomSheet(),
+                      );
+
+                      if (!mounted || result == null) {
+                        return;
+                      }
+
+                      messenger.showSnackBar(
+                        const SnackBar(
+                          content: Text('Dokumen hasil scan berhasil diupload.'),
+                        ),
+                      );
                     },
                   ),
                   QuickActionCard(

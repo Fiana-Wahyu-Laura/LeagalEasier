@@ -18,6 +18,7 @@ class Settings(BaseSettings):
         validation_alias="DATABASE_URL",
     )
     firebase_credentials_path: str = Field(default="", validation_alias="FIREBASE_CREDENTIALS_PATH")
+    firebase_web_api_key: str = Field(default="", validation_alias="FIREBASE_WEB_API_KEY")
     claude_api_key: str = Field(default="", validation_alias="CLAUDE_API_KEY")
     openai_api_key: str = Field(default="", validation_alias="OPENAI_API_KEY")
     secret_key: str = Field(default="change-me", validation_alias="SECRET_KEY")

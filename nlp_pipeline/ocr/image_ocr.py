@@ -1,10 +1,10 @@
 """
 ocr/image_ocr.py — LegalEasier NLP Pipeline
-Ekstraksi teks dari gambar (JPG, PNG) atau PDF scan menggunakan Tesseract OCR.
+Ekstraksi teks dari gambar (JPG, PNG, TIFF) atau PDF scan menggunakan Tesseract OCR.
 
 Digunakan sebagai fallback ketika PyMuPDF tidak menghasilkan teks yang valid.
 Mendukung input berupa:
-- File gambar langsung (JPG/PNG)
+- File gambar langsung (JPG/PNG/TIFF)
 - PDF scan (setiap halaman dikonversi ke gambar terlebih dahulu via PyMuPDF)
 
 Rules (CLAUDE.md §9 - OCR):
@@ -73,11 +73,11 @@ def _image_to_text(image: Image.Image) -> str:
 
 def extract_text_from_image(file_bytes: bytes, file_type: str = "jpg") -> OCRResult:
     """
-    Ekstrak teks dari file gambar (JPG/PNG) menggunakan Tesseract OCR.
+    Ekstrak teks dari file gambar (JPG/PNG/TIFF) menggunakan Tesseract OCR.
 
     Args:
         file_bytes: Konten file gambar dalam bytes.
-        file_type: Tipe file — "jpg", "jpeg", atau "png".
+        file_type: Tipe file — "jpg", "jpeg", "png", "tiff", atau "tif".
 
     Returns:
         OCRResult dengan teks hasil OCR dan ocr_used=True.

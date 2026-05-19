@@ -110,7 +110,7 @@ app.add_middleware(
 # Allowed file types
 # ---------------------------------------------------------------------------
 
-ALLOWED_FILE_TYPES = {"pdf", "jpg", "jpeg", "png"}
+ALLOWED_FILE_TYPES = {"pdf", "jpg", "jpeg", "png", "tiff", "tif"}
 
 
 def _validate_file_type(file_type: str) -> str:
@@ -240,7 +240,7 @@ async def health_check() -> HealthResponse:
 )
 async def ocr_extract(
     file: UploadFile = File(..., description="File dokumen (PDF, JPG, PNG)."),
-    file_type: str = Form(..., description="Tipe file: 'pdf', 'jpg', 'jpeg', 'png'."),
+    file_type: str = Form(..., description="Tipe file: 'pdf', 'jpg', 'jpeg', 'png', 'tiff'."),
     document_id: str = Form(
         default="",
         description="UUID dokumen dari backend (opsional, untuk tracking).",
@@ -297,8 +297,8 @@ async def ocr_extract(
     status_code=status.HTTP_200_OK,
 )
 async def nlp_process(
-    file: UploadFile = File(..., description="File dokumen (PDF, JPG, PNG)."),
-    file_type: str = Form(..., description="Tipe file: 'pdf', 'jpg', 'jpeg', 'png'."),
+    file: UploadFile = File(..., description="File dokumen (PDF, JPG, PNG, TIFF)."),
+    file_type: str = Form(..., description="Tipe file: 'pdf', 'jpg', 'jpeg', 'png', 'tiff'."),
     document_id: str = Form(..., description="UUID dokumen dari backend (wajib)."),
 ) -> ProcessResponse:
     """
