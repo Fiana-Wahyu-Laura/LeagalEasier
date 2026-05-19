@@ -14,11 +14,12 @@ from fastapi.testclient import TestClient
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from app.api.routes.documents import get_nlp_client
-from app.api.routes.documents import get_storage_service
+from app.api.deps import get_current_user, get_db
+from app.api.routes.documents import get_nlp_client, get_storage_service
 from app.core.config import get_settings
 from app.main import app
 from app.models.document import Document
+from app.schemas.auth import AuthUser
 from app.schemas.nlp import NLPProcessResponse, NLPRiskClause
 from app.services.storage import StorageService
 
@@ -50,8 +51,22 @@ def storage_service(tmp_path: Path) -> StorageService:
 
 @pytest.fixture(autouse=True)
 def override_dependencies(storage_service: StorageService):
+    # Mock storage service
     app.dependency_overrides[get_storage_service] = lambda: storage_service
+    
+    # Mock NLP client
     app.dependency_overrides[get_nlp_client] = lambda: MockNLPClient()
+    
+    # Mock get_current_user to return a test user (no auth required for tests)
+    async def mock_get_current_user():
+        return AuthUser(
+            id=uuid.uuid4(),
+            email="test@example.com",
+            display_name="Test User",
+            is_active=True,
+        )
+    
+    app.dependency_overrides[get_current_user] = mock_get_current_user
     yield
     app.dependency_overrides.clear()
 
@@ -103,6 +118,11 @@ def test_upload_document_persists_and_runs_mock_ocr(client: TestClient, storage_
 
     response = client.post("/api/v1/documents/upload", files=files)
 
+    # Debug: print response if not 201
+    if response.status_code != 201:
+        print(f"Response status: {response.status_code}")
+        print(f"Response body: {response.text}")
+    
     assert response.status_code == 201
     payload = response.json()
     assert payload["filename"] == "sample.pdf"
@@ -119,12 +139,6 @@ def test_upload_document_persists_and_runs_mock_ocr(client: TestClient, storage_
 
     asyncio.run(cleanup_document(document_id))
     stored_file.unlink(missing_ok=True)
-
-
-def test_auth_me_without_token_returns_placeholder(client: TestClient):
-    response = client.get("/api/v1/auth/me")
-    assert response.status_code == 200
-    assert response.json()["email"] == "placeholder@legaleasier.dev"
 
 
 def test_health_endpoint(client: TestClient):

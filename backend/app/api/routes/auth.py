@@ -1,65 +1,32 @@
 """
 Authentication API routes.
-Stub implementation for non-blocking frontend development.
-TODO: Integrate Firebase token verification.
+Endpoints for user auth and profile management.
+Per CLAUDE.md Section 8: All endpoints except /auth/* require Bearer JWT token.
 """
 
-import uuid
-from fastapi import APIRouter, Header, HTTPException, status
+from fastapi import APIRouter, Depends, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.api.deps import get_current_user, get_db
+from app.schemas.auth import AuthUser
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-class CurrentUser:
-    """Placeholder user for stub auth."""
-
-    def __init__(self):
-        self.id: uuid.UUID = uuid.uuid4()
-        self.email: str = "placeholder@legaleasier.dev"
-        self.name: str = "Placeholder User"
-        self.is_active: bool = True
-
-
-@router.get("/me")
-async def get_current_user(
-    authorization: str = Header(None),
-) -> dict:
+@router.get("/me", response_model=AuthUser)
+async def get_me(
+    current_user: AuthUser = Depends(get_current_user),
+) -> AuthUser:
     """
-    Get current authenticated user.
-    Stub: Returns placeholder user if no auth header.
-    TODO: Verify Firebase token and return actual user.
+    Get current authenticated user profile.
+    
+    Requires: Bearer token (Firebase ID token)
+    
+    Response per CLAUDE.md Section 8:
+    - id: UUID of user
+    - email: Email address
+    - display_name: Optional display name
+    - is_active: Account status
     """
-    if not authorization:
-        # Stub: Return placeholder user for non-blocking frontend dev
-        user = CurrentUser()
-        return {
-            "id": str(user.id),
-            "email": user.email,
-            "name": user.name,
-            "is_active": user.is_active,
-        }
+    return current_user
 
-    # TODO: Parse Bearer token and verify with Firebase
-    # For now, just accept any token and return placeholder
-    try:
-        if authorization.startswith("Bearer "):
-            # In future: verify_firebase_token(authorization[7:])
-            user = CurrentUser()
-            return {
-                "id": str(user.id),
-                "email": user.email,
-                "name": user.name,
-                "is_active": user.is_active,
-            }
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid authorization header format",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
