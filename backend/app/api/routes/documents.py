@@ -34,7 +34,7 @@ async def upload_document(
 ) -> DocumentResponse:
     """
     Upload a document (PDF or image).
-    Validates file type and size, saves to storage, creates DB record.
+    Validates file type and size, saves to PostgreSQL bytea, creates DB record.
     Returns document ID and status "pending".
     """
     # Validate MIME type
@@ -60,14 +60,15 @@ async def upload_document(
             tmp.write(content)
             tmp_path = tmp.name
 
-        # Save to storage service
-        storage_path = storage.save_file(tmp_path, file.filename, doc_id)
+        # Save to storage service (returns storage_path and file_content for bytea)
+        storage_path, file_content = storage.save_file(tmp_path, file.filename, doc_id)
 
-        # Create DB record
+        # Create DB record with file content in bytea column
         document = Document(
             id=doc_id,
             filename=file.filename,
             storage_path=storage_path,
+            file_content=file_content,  # Store binary content in PostgreSQL
             status="pending",
             owner_id=None,  # TODO: Extract from auth token
         )

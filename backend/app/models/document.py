@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, String, Text
+from sqlalchemy import Column, DateTime, ForeignKey, Index, Integer, LargeBinary, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.models.base import Base
@@ -14,6 +14,7 @@ class Document(Base):
     owner_id: uuid.UUID | None = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
     filename: str = Column(String(1024), nullable=False)
     storage_path: str = Column(String(2048), nullable=False)
+    file_content: bytes | None = Column(LargeBinary(), nullable=True)
     status: str = Column(String(32), nullable=False, default="pending")
     extracted_text: str | None = Column(Text, nullable=True)
     summary: str | None = Column(Text, nullable=True)

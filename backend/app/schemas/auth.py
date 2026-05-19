@@ -3,7 +3,7 @@ Authentication schemas.
 """
 
 import uuid
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class AuthUser(BaseModel):
@@ -15,3 +15,22 @@ class AuthUser(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class AuthRegisterRequest(BaseModel):
+    """User registration request."""
+    email: EmailStr = Field(..., description="User email address")
+    password: str = Field(..., min_length=6, description="Password (minimum 6 characters)")
+    display_name: str | None = Field(None, description="Optional display name")
+
+
+class AuthLoginRequest(BaseModel):
+    """User login request."""
+    email: EmailStr = Field(..., description="User email address")
+    password: str = Field(..., description="User password")
+
+
+class AuthTokenResponse(BaseModel):
+    """Authentication response with user and token."""
+    user: AuthUser
+    token: str = Field(..., description="Firebase custom token for authentication")
