@@ -17,17 +17,30 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # Add analysis fields to documents table
-    op.add_column("documents", sa.Column("summary", sa.Text(), nullable=True))
-    op.add_column("documents", sa.Column("risk_score", sa.Integer(), nullable=True))
-    op.add_column(
-        "documents",
-        sa.Column("risk_clauses_json", sa.Text(), nullable=True),
-    )
+    bind = op.get_bind()
+    inspector = sa.inspect(bind)
+    columns = {column["name"] for column in inspector.get_columns("documents")}
+
+    if "summary" not in columns:
+        op.add_column("documents", sa.Column("summary", sa.Text(), nullable=True))
+    if "risk_score" not in columns:
+        op.add_column("documents", sa.Column("risk_score", sa.Integer(), nullable=True))
+    if "risk_clauses_json" not in columns:
+        op.add_column(
+            "documents",
+            sa.Column("risk_clauses_json", sa.Text(), nullable=True),
+        )
 
 
 def downgrade() -> None:
-    op.drop_column("documents", "risk_clauses_json")
-    op.drop_column("documents", "risk_score")
-    op.drop_column("documents", "summary")
+    bind = op.get_bind()
+    inspector = sa.inspect(bind)
+    columns = {column["name"] for column in inspector.get_columns("documents")}
+
+    if "risk_clauses_json" in columns:
+        op.drop_column("documents", "risk_clauses_json")
+    if "risk_score" in columns:
+        op.drop_column("documents", "risk_score")
+    if "summary" in columns:
+        op.drop_column("documents", "summary")
 

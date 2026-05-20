@@ -17,17 +17,31 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # Add firebase_uid column to users table
-    # Make it nullable initially to avoid blocking existing users, then set NOT NULL later
-    op.add_column(
-        "users",
-        sa.Column("firebase_uid", sa.String(length=255), nullable=True),
-    )
-    # Create unique index on firebase_uid
-    op.create_index("ix_users_firebase_uid", "users", ["firebase_uid"], unique=True)
+    bind = op.get_bind()
+    inspector = sa.inspect(bind)
+
+    columns = {column["name"] for column in inspector.get_columns("users")}
+    if "firebase_uid" not in columns:
+        op.add_column(
+            "users",
+            sa.Column("firebase_uid", sa.String(length=255), nullable=True),
+        )
+        inspector = sa.inspect(bind)
+
+    indexes = {index["name"] for index in inspector.get_indexes("users")}
+    if "ix_users_firebase_uid" not in indexes:
+        op.create_index("ix_users_firebase_uid", "users", ["firebase_uid"], unique=True)
 
 
 def downgrade() -> None:
-    op.drop_index("ix_users_firebase_uid", table_name="users")
-    op.drop_column("users", "firebase_uid")
+    bind = op.get_bind()
+    inspector = sa.inspect(bind)
+
+    indexes = {index["name"] for index in inspector.get_indexes("users")}
+    if "ix_users_firebase_uid" in indexes:
+        op.drop_index("ix_users_firebase_uid", table_name="users")
+
+    columns = {column["name"] for column in inspector.get_columns("users")}
+    if "firebase_uid" in columns:
+        op.drop_column("users", "firebase_uid")
 
