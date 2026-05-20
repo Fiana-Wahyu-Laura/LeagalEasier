@@ -17,12 +17,21 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # Add file_content column to documents table to store file data in PostgreSQL
-    op.add_column(
-        "documents",
-        sa.Column("file_content", sa.LargeBinary(), nullable=True),
-    )
+    bind = op.get_bind()
+    inspector = sa.inspect(bind)
+    columns = {column["name"] for column in inspector.get_columns("documents")}
+
+    if "file_content" not in columns:
+        op.add_column(
+            "documents",
+            sa.Column("file_content", sa.LargeBinary(), nullable=True),
+        )
 
 
 def downgrade() -> None:
-    op.drop_column("documents", "file_content")
+    bind = op.get_bind()
+    inspector = sa.inspect(bind)
+    columns = {column["name"] for column in inspector.get_columns("documents")}
+
+    if "file_content" in columns:
+        op.drop_column("documents", "file_content")
