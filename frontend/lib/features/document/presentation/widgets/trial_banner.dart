@@ -14,14 +14,14 @@ class TrialBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.accentLight.withValues(alpha: 0.2),
+        color: AppColors.accentLight.withValues(alpha: 0.18),
         border: Border.all(
           color: AppColors.accent,
           width: 1,
         ),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
       ),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       child: Row(
         children: [
           Expanded(
@@ -45,11 +45,11 @@ class TrialBanner extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               color: AppColors.accent,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(10),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
             child: Text(
-              'Coba',
+              'Upgrade',
               style: AppTextStyles.badgeText.copyWith(
                 color: AppColors.brand,
               ),

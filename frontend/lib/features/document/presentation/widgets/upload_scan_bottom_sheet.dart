@@ -242,7 +242,7 @@ class _UploadScanBottomSheetState extends ConsumerState<UploadScanBottomSheet> {
     } on Exception catch (error) {
       if (!mounted) return;
       messenger.showSnackBar(
-        SnackBar(content: Text('Gagal membuka kamera: $error')),
+        const SnackBar(content: Text('Gagal membuka kamera. Coba lagi.')),
       );
     }
   }
@@ -266,7 +266,7 @@ class _UploadScanBottomSheetState extends ConsumerState<UploadScanBottomSheet> {
     } on Exception catch (error) {
       if (!mounted) return;
       messenger.showSnackBar(
-        SnackBar(content: Text('Gagal memilih file: $error')),
+        const SnackBar(content: Text('Gagal memilih file. Coba lagi.')),
       );
     }
   }
@@ -294,13 +294,9 @@ class _UploadScanBottomSheetState extends ConsumerState<UploadScanBottomSheet> {
     } on Exception catch (error) {
       if (!mounted) return;
       messenger.showSnackBar(
-        SnackBar(content: Text('Upload gagal: ${_formatErrorMessage(error)}')),
+        const SnackBar(content: Text('Upload gagal. Silakan coba lagi.')),
       );
     }
-  }
-
-  String _formatErrorMessage(Object error) {
-    return error.toString().replaceFirst(RegExp(r'^Exception:\s*'), '');
   }
 
   /// Scan preview dengan corner brackets dan scan line

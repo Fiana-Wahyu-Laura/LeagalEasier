@@ -21,6 +21,27 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool _isSigningOut = false;
 
+  Widget _buildAvatar(String userInitial) {
+    return Container(
+      width: 36,
+      height: 36,
+      decoration: const BoxDecoration(
+        color: AppColors.accent,
+        shape: BoxShape.circle,
+      ),
+      child: Center(
+        child: Text(
+          userInitial,
+          style: const TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 14,
+            color: AppColors.brand,
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _signOut() async {
     setState(() {
       _isSigningOut = true;
@@ -33,9 +54,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            error.toString(),
-            style: const TextStyle(color: Colors.white),
+          content: const Text(
+            'Gagal keluar. Silakan coba lagi.',
+            style: TextStyle(color: Colors.white),
           ),
           backgroundColor: AppColors.danger,
         ),
@@ -59,13 +80,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       backgroundColor: AppColors.pageBackground,
       appBar: AppBar(
         backgroundColor: AppColors.brand,
-        title: const Text(
+        title: Text(
           'Beranda',
-          style: TextStyle(
-            color: Colors.white,
-            fontFamily: 'Fraunces',
+          style: AppTextStyles.homeTitle.copyWith(
             fontSize: 20,
-            fontWeight: FontWeight.w700,
           ),
         ),
         elevation: 0,
@@ -75,35 +93,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Center(
               child: GestureDetector(
                 onTap: _isSigningOut ? null : _signOut,
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: const BoxDecoration(
-                    color: AppColors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: _isSigningOut
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              AppColors.brand,
-                            ),
-                          ),
-                        )
-                      : Center(
-                          child: Text(
-                            userInitial,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 14,
-                              color: AppColors.brand,
-                            ),
+                child: _isSigningOut
+                    ? const SizedBox(
+                        width: 36,
+                        height: 36,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            AppColors.white,
                           ),
                         ),
-                ),
+                      )
+                    : _buildAvatar(userInitial),
               ),
             ),
           ),
@@ -120,16 +121,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               // Greeting section
               Text(
                 'Halo!',
-                style: AppTextStyles.screenTitle.copyWith(
-                  fontFamily: 'Fraunces',
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: AppTextStyles.homeTitle.copyWith(fontSize: 24),
               ),
               const SizedBox(height: 4),
               Text(
                 'Selamat datang, $userEmail',
-                style: AppTextStyles.bodyMedium,
+                style: AppTextStyles.bodyLarge,
               ),
               const SizedBox(height: 16),
 
@@ -167,8 +164,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               // Quick actions grid
               Text(
                 'Mulai dari sini',
-                style: AppTextStyles.cardTitle.copyWith(
-                  fontWeight: FontWeight.w600,
+                style: AppTextStyles.sectionTitle.copyWith(
+                  fontSize: 18,
                 ),
               ),
               const SizedBox(height: 12),

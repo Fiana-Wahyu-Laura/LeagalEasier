@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// LegalEasy Design System Color Palette
 class AppColors {
@@ -6,12 +7,14 @@ class AppColors {
   static const Color brand = Color(0xFF1A3A4A);        // Navy gelap
   static const Color brand2 = Color(0xFF2E6B5E);       // Teal
   static const Color accent = Color(0xFFC8A96E);       // Gold
-  static const Color accentLight = Color(0xFFE8D5B0);  // Gold muda
+  static const Color accent2 = Color(0xFFE8D5B0);      // Gold muda
+  static const Color accentLight = accent2;
 
   // Neutral
   static const Color soft = Color(0xFFF4F0E8);         // Krem
   static const Color white = Color(0xFFFFFFFF);
-  static const Color pageBackground = Color(0xFFE8E4DC);
+  static const Color pageBg = Color(0xFFE8E4DC);       // Warm off-white
+  static const Color pageBackground = pageBg;
 
   // Text
   static const Color text1 = Color(0xFF1A1A1A);        // Teks utama
@@ -20,8 +23,10 @@ class AppColors {
 
   // Risk levels
   static const Color danger = Color(0xFFC0392B);       // Tinggi
-  static const Color warning = Color(0xFFD68910);      // Sedang
-  static const Color success = Color(0xFF1E8449);      // Aman / Rendah
+  static const Color warn = Color(0xFFD68910);         // Sedang
+  static const Color warning = warn;
+  static const Color ok = Color(0xFF1E8449);           // Aman / Rendah
+  static const Color success = ok;
 
   // Quick action backgrounds
   static const Color uploadBg = Color(0xFFD5EDE8);
@@ -54,9 +59,23 @@ class AppTextStyles {
 
   static const screenTitle = TextStyle(
     fontFamily: 'Fraunces',
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: FontWeight.w700,
     color: AppColors.text1,
+  );
+
+  static const homeTitle = TextStyle(
+    fontFamily: 'Fraunces',
+    fontSize: 20,
+    fontWeight: FontWeight.w700,
+    color: AppColors.white,
+  );
+
+  static const sectionTitle = TextStyle(
+    fontFamily: 'Fraunces',
+    fontSize: 18,
+    fontWeight: FontWeight.w700,
+    color: AppColors.brand,
   );
 
   static const loginTitle = TextStyle(
@@ -68,8 +87,15 @@ class AppTextStyles {
 
   static const cardTitle = TextStyle(
     fontFamily: 'DM Sans',
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: FontWeight.w500,
+    color: AppColors.text1,
+  );
+
+  static const limitTitle = TextStyle(
+    fontFamily: 'Fraunces',
+    fontSize: 20,
+    fontWeight: FontWeight.w700,
     color: AppColors.text1,
   );
 
@@ -84,6 +110,13 @@ class AppTextStyles {
 
   static const bodyMedium = TextStyle(
     fontFamily: 'DM Sans',
+    fontSize: 13,
+    fontWeight: FontWeight.w400,
+    color: AppColors.text2,
+  );
+
+  static const bodySmall = TextStyle(
+    fontFamily: 'DM Sans',
     fontSize: 12,
     fontWeight: FontWeight.w400,
     color: AppColors.text2,
@@ -91,9 +124,9 @@ class AppTextStyles {
 
   static const label = TextStyle(
     fontFamily: 'DM Sans',
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: FontWeight.w500,
-    color: AppColors.text2,
+    color: AppColors.text1,
   );
 
   static const meta = TextStyle(
@@ -105,15 +138,42 @@ class AppTextStyles {
 
   static const buttonText = TextStyle(
     fontFamily: 'DM Sans',
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    color: AppColors.white,
+  );
+
+  static const btnSmall = TextStyle(
+    fontFamily: 'DM Sans',
     fontSize: 13,
     fontWeight: FontWeight.w500,
     color: AppColors.white,
+  );
+
+  static const screenLabel = TextStyle(
+    fontFamily: 'DM Sans',
+    fontSize: 10,
+    fontWeight: FontWeight.w500,
+    color: AppColors.text3,
+    letterSpacing: 1.0,
   );
 
   static const badgeText = TextStyle(
     fontFamily: 'DM Sans',
     fontSize: 10,
     fontWeight: FontWeight.w500,
+  );
+
+  static const statNum = TextStyle(
+    fontFamily: 'DM Sans',
+    fontSize: 18,
+    fontWeight: FontWeight.w500,
+    color: AppColors.text1,
+  );
+
+  static const navLabel = TextStyle(
+    fontFamily: 'DM Sans',
+    fontSize: 10,
   );
 
   static const chipText = TextStyle(
@@ -128,20 +188,29 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       fontFamily: 'DM Sans',
+      textTheme: GoogleFonts.dmSansTextTheme().apply(
+        bodyColor: AppColors.text1,
+        displayColor: AppColors.text1,
+      ),
+      primaryTextTheme: GoogleFonts.frauncesTextTheme().apply(
+        bodyColor: AppColors.white,
+        displayColor: AppColors.white,
+      ),
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.brand,
         primary: AppColors.brand,
         secondary: AppColors.brand2,
-        surface: AppColors.pageBackground,
+        surface: AppColors.white,
       ),
-      scaffoldBackgroundColor: AppColors.pageBackground,
+      scaffoldBackgroundColor: AppColors.pageBg,
       
       // App Bar
       appBarTheme: const AppBarTheme(
         elevation: 0,
-        backgroundColor: AppColors.white,
+        backgroundColor: AppColors.brand,
+        foregroundColor: AppColors.white,
         surfaceTintColor: Colors.transparent,
-        iconTheme: IconThemeData(color: AppColors.text1),
+        iconTheme: IconThemeData(color: AppColors.white),
         titleTextStyle: AppTextStyles.screenTitle,
         centerTitle: false,
       ),
@@ -184,8 +253,8 @@ class AppTheme {
       // Elevated Button
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.accent,
-          foregroundColor: AppColors.brand,
+          backgroundColor: AppColors.brand,
+          foregroundColor: AppColors.white,
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
           minimumSize: const Size.fromHeight(50),
           shape: RoundedRectangleBorder(
@@ -199,10 +268,10 @@ class AppTheme {
       // Outlined Button
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.white,
+          foregroundColor: AppColors.brand2,
           side: const BorderSide(
-            color: Color.fromRGBO(255, 255, 255, 0.4),
-            width: 1.5,
+            color: Color(0xFFE0E0E0),
+            width: 1.2,
           ),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           minimumSize: const Size.fromHeight(50),
@@ -218,6 +287,15 @@ class AppTheme {
         style: TextButton.styleFrom(
           foregroundColor: AppColors.brand2,
           textStyle: AppTextStyles.label,
+        ),
+      ),
+
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: AppColors.brand2,
+        foregroundColor: AppColors.white,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(50),
         ),
       ),
 

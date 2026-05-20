@@ -18,7 +18,7 @@ class StatBox extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.soft,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
       ),
       padding: const EdgeInsets.all(10),
       child: Column(
@@ -26,19 +26,12 @@ class StatBox extends StatelessWidget {
         children: [
           Text(
             number,
-            style: const TextStyle(
-              fontFamily: 'DM Sans',
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-              color: AppColors.text1,
-            ),
+            style: AppTextStyles.statNum,
           ),
           const SizedBox(height: 2),
           Text(
             label,
-            style: AppTextStyles.meta.copyWith(
-              fontSize: 10,
-            ),
+            style: AppTextStyles.screenLabel,
             textAlign: TextAlign.center,
           ),
         ],
